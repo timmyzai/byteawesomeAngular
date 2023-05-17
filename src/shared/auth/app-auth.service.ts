@@ -9,7 +9,6 @@ import {
 } from 'src/shared/service-proxies/service-proxies';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { CookiesService } from '../services/cookies.service';
-import { TokenService } from '../services/token.service';
 
 @Injectable()
 export class AppAuthService {
@@ -22,14 +21,13 @@ export class AppAuthService {
     private _router: Router,
     private _encryptionService: EncryptionService,
     private _cookieService: CookiesService,
-    private _tokenService: TokenService
   ) {
     this.clear();
   }
 
   logout(reload?: boolean): void {
-    this._tokenService.clearToken();
     this._cookieService.deleteCookie(AppConsts.authorization.encryptedAuthTokenName);
+    this._cookieService.deleteCookie("accessToken");
 
     if (reload !== false) {
       location.href = AppConsts.appBaseUrl;
@@ -37,7 +35,7 @@ export class AppAuthService {
   }
 
   authenticate(finallyCallback?: () => void): void {
-    finallyCallback = finallyCallback || (() => {});
+    finallyCallback = finallyCallback || (() => { });
 
     this._tokenAuthService.authenticate(this.authenticateModel)
       .pipe(
@@ -57,9 +55,9 @@ export class AppAuthService {
 
     if (
       this.authenticateResult.require2fa &&
-      this.authenticateModel.authKey == null
+      this.authenticateModel.twoFactorPin == null
     ) {
-      this._router.navigate(['app/two-way-auth']);
+      this._router.navigate(['two-way-auth']);
     } else {
       if (authenticateResult.accessToken) {
         this.login(
@@ -70,7 +68,7 @@ export class AppAuthService {
         );
       } else {
         console.error('Unexpected authenticateResult!');
-        this._router.navigate(['app/login']);
+        this._router.navigate(['login']);
       }
     }
   }
@@ -81,31 +79,20 @@ export class AppAuthService {
     expireInSeconds: number,
     rememberMe?: boolean
   ): void {
-    const tokenExpireDate = rememberMe
-      ? new Date(new Date().getTime() + 1000 * expireInSeconds)
-      : undefined;
+    const tokenExpireDate = rememberMe ? new Date(new Date().getTime() + 1000 * expireInSeconds) : undefined;
 
-    this._tokenService.setToken(accessToken, tokenExpireDate);
-
-    this._cookieService.setCookieValue(
-      AppConsts.authorization.encryptedAuthTokenName,
-      encryptedAccessToken,
-      tokenExpireDate
-    );
+    this._cookieService.setCookieValue("accessToken", accessToken, tokenExpireDate);
+    this._cookieService.setCookieValue(AppConsts.authorization.encryptedAuthTokenName, encryptedAccessToken, tokenExpireDate);
 
     if (rememberMe) {
-      this._cookieService.setCookieValue(
-        'UserProfile.UsernameOrEmail',
-        this._encryptionService.encrypt(
-          this.authenticateModel.userNameOrEmailAddress
-        ),
-        new Date(new Date().getTime() + 5 * 365 * 86400000) // 5 year
-      );
+      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userNameOrEmailAddress);
+      var expiryDate = new Date(new Date().getTime() + 5 * 365 * 86400000); // 5 year
+      this._cookieService.setCookieValue('UserProfile.UsernameOrEmail', encryptedUsernameOrEmail, expiryDate);
     } else {
       this._cookieService.deleteCookie('UserProfile.UsernameOrEmail');
     }
 
-    location.href = AppConsts.appBaseUrl;
+    location.href = AppConsts.appBaseUrl + "/home";
   }
 
   private clear(): void {

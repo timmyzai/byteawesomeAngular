@@ -14,15 +14,15 @@ export class CookiesService {
     }
     return null;
   }
-  setCookieValue(key, value, expiryDate) {
-    document.cookie =
-      key + '=' + value + '; expires=' + expiryDate.toUTCString() + '; path=/';
+  setCookieValue(key, value, expiryDate?: Date) {
+    if (expiryDate) {
+      document.cookie = key + '=' + value + '; expires=' + expiryDate.toUTCString() + '; path=/';
+    } else {
+      this.deleteCookie(key);
+    }
   }
 
   deleteCookie(key) {
-    document.cookie =
-      encodeURIComponent(key) +
-      '=; expires=' +
-      new Date(new Date().getTime() - 86400000).toUTCString();
+    document.cookie = encodeURIComponent(key) + '=; expires=' + new Date(new Date().getTime() - 86400000).toUTCString();
   }
 }

@@ -13,13 +13,23 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppInitializer } from 'src/app-initializer';
 import { AppConsts } from 'src/shared/AppConsts';
 import { API_BASE_URL } from 'src/shared/service-proxies/service-proxies';
+import { HomeComponent } from './home/home.component';
+import { TwoFactorAuthModalComponent } from './two-factor-auth/two-factor-auth-modal/two-factor-auth-modal.component';
+import { TwoFactorAuthComponent } from './two-factor-auth/two-factor-auth/two-factor-auth.component';
+import { SecretPlaceComponent } from './secret-place/secret-place.component';
+import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-setup/two-factor-auth-setup.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    HomeComponent,
+    TwoFactorAuthModalComponent,
+    TwoFactorAuthComponent,
+    SecretPlaceComponent,
+    TwoFactorAuthSetupComponent
   ],
   imports: [
     BrowserModule,

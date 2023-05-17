@@ -38,7 +38,6 @@ export class LoginComponent { j
 
   login(): void {
     this.submitting = true;
-    this.authService.authenticateModel.authKey = "string";
     this.authService.authenticate(() => (this.submitting = false));
   }
 }

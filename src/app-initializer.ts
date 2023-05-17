@@ -12,6 +12,7 @@ export class AppInitializer {
   private getAppConfig(): Observable<any> {
     return this.http.get<any>('assets/appconfig.json').pipe(
       tap((response) => {
+        AppConsts.appBaseUrl = response.appBaseUrl;
         AppConsts.remoteServiceBaseUrl = response.remoteServiceBaseUrl;
       })
     );
