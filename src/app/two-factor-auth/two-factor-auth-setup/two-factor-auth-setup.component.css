@@ -1,0 +1,52 @@
+/* Custom CSS for the switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: .4s;
+}
+
+/* Styling when the switch is in the "enabled" state */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+/* Styling when the switch is in the "disabled" state */
+input[type="checkbox"]:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Hide the actual checkbox */
+input[type="checkbox"] {
+  display: none;
+}
+
+/* Custom CSS for the switch labels */
+.enable-label,
+.disable-label {
+  margin: 0 5px;
+}
+
+.enabled-label {
+  display: flex;
+  align-items: center;
+}

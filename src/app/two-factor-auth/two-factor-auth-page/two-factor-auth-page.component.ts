@@ -1,27 +1,31 @@
 import { Component, EventEmitter, } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal';
+import { Router } from '@angular/router';
+import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
+import { AppAuthService } from 'src/shared/auth/app-auth.service';
 import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/service-proxies';
+
 @Component({
-  selector: 'app-two-factor-auth-modal',
-  templateUrl: './two-factor-auth-modal.component.html',
-  styleUrls: ['./two-factor-auth-modal.component.css'],
+  selector: 'app-two-factor-auth-page',
+  templateUrl: './two-factor-auth-page.component.html',
+  styleUrls: ['./two-factor-auth-page.component.css'],
+  animations: [accountModuleAnimation()]
+
 })
-export class TwoFactorAuthModalComponent {
+
+export class TwoFactorAuthPageComponent {
   isLoading: Boolean;
   otpLength: number = 6;
   otpBoxes: string[] = Array(this.otpLength).fill('');
   isValidInput: Boolean = false;
   isInvalidPin: Boolean = false;
   validateTwoFactorResult: EventEmitter<boolean> = new EventEmitter<boolean>();
+  submitting: boolean;
 
   constructor(
-    public _bsModalRef: BsModalRef,
     private _twoFactorAuthService: TwoFactorAuthServiceProxy,
+    private route: Router,
+    public authService: AppAuthService,
   ) {
-  }
-
-  hideModal() {
-    this._bsModalRef.hide();
   }
 
   onOtpChange(event: any): void {
@@ -36,7 +40,7 @@ export class TwoFactorAuthModalComponent {
       this.otpBoxes[i] = otp[i];
     }
     this.isInvalidPin = false;
-    this.isValidInput= otp.length === this.otpLength;
+    this.isValidInput = otp.length === this.otpLength;
   }
 
   submit() {
@@ -45,12 +49,20 @@ export class TwoFactorAuthModalComponent {
     this._twoFactorAuthService.validateTwoFactorPIN(userId, twoFactorPin).subscribe(
       (bool) => {
         if (bool) {
-          this.validateTwoFactorResult.emit(bool);
-          this.hideModal();
+          this.login(twoFactorPin);
         } else {
           this.isInvalidPin = true;
         }
       }
     )
+  }
+  back() {
+    this.route.navigate(["login"]);
+  }
+
+  login(twoFactorPin: string): void {
+    this.submitting = true;
+    this.authService.authenticateModel.twoFactorPin = twoFactorPin;
+    this.authService.authenticate(() => (this.submitting = false));
   }
 }

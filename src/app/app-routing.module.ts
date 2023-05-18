@@ -1,16 +1,19 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
+import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-setup/two-factor-auth-setup.component';
+import { SecretPlaceComponent } from './secret-place/secret-place.component';
+import { TwoFactorAuthPageComponent } from './two-factor-auth/two-factor-auth-page/two-factor-auth-page.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
   { path: 'home', component: HomeComponent },
-  { path: 'two-factor-auth-setup', component: HomeComponent },
-  { path: 'two-factor-auth', component: HomeComponent },
-  { path: 'secret-place', component: HomeComponent },
+  { path: 'two-factor-auth-setup', component: TwoFactorAuthSetupComponent },
+  { path: 'two-factor-auth-page', component: TwoFactorAuthPageComponent },
+  { path: 'secret-place', component: SecretPlaceComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
 
 @NgModule({

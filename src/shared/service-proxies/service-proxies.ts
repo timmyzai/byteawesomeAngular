@@ -97,15 +97,10 @@ export class TwoFactorAuthServiceProxy {
     }
 
     /**
-     * @param userId (optional) 
      * @return Success
      */
-    enableTwoFactorAuthentication(userId: number | undefined): Observable<TwoFactorsAuthDto> {
-        let url_ = this.baseUrl + "/api/TwoFactorAuth/EnableTwoFactorAuthentication?";
-        if (userId === null)
-            throw new Error("The parameter 'userId' cannot be null.");
-        else if (userId !== undefined)
-            url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+    enableTwoFactorAuthentication(): Observable<TwoFactorAuthDto> {
+        let url_ = this.baseUrl + "/api/TwoFactorAuth/EnableTwoFactorAuthentication";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -123,14 +118,14 @@ export class TwoFactorAuthServiceProxy {
                 try {
                     return this.processEnableTwoFactorAuthentication(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<TwoFactorsAuthDto>;
+                    return _observableThrow(e) as any as Observable<TwoFactorAuthDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<TwoFactorsAuthDto>;
+                return _observableThrow(response_) as any as Observable<TwoFactorAuthDto>;
         }));
     }
 
-    protected processEnableTwoFactorAuthentication(response: HttpResponseBase): Observable<TwoFactorsAuthDto> {
+    protected processEnableTwoFactorAuthentication(response: HttpResponseBase): Observable<TwoFactorAuthDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -141,7 +136,7 @@ export class TwoFactorAuthServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TwoFactorsAuthDto.fromJS(resultData200);
+            result200 = TwoFactorAuthDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -149,7 +144,7 @@ export class TwoFactorAuthServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<TwoFactorsAuthDto>(null as any);
+        return _observableOf<TwoFactorAuthDto>(null as any);
     }
 
     /**
@@ -215,11 +210,371 @@ export class TwoFactorAuthServiceProxy {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    disableTwoFactorAuthentication(body: TwoFactorAuthDto | undefined): Observable<TwoFactorAuthDto> {
+        let url_ = this.baseUrl + "/api/TwoFactorAuth/DisableTwoFactorAuthentication";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDisableTwoFactorAuthentication(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDisableTwoFactorAuthentication(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TwoFactorAuthDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TwoFactorAuthDto>;
+        }));
+    }
+
+    protected processDisableTwoFactorAuthentication(response: HttpResponseBase): Observable<TwoFactorAuthDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TwoFactorAuthDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TwoFactorAuthDto>(null as any);
+    }
+
+    /**
      * @param userId (optional) 
      * @return Success
      */
-    disableTwoFactorAuthentication(userId: number | undefined): Observable<TwoFactorsAuthDto> {
-        let url_ = this.baseUrl + "/api/TwoFactorAuth/DisableTwoFactorAuthentication?";
+    getTwoFactorAuthInfo(userId: number | undefined): Observable<TwoFactorAuthDto> {
+        let url_ = this.baseUrl + "/api/TwoFactorAuth/GetTwoFactorAuthInfo?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTwoFactorAuthInfo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTwoFactorAuthInfo(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TwoFactorAuthDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TwoFactorAuthDto>;
+        }));
+    }
+
+    protected processGetTwoFactorAuthInfo(response: HttpResponseBase): Observable<TwoFactorAuthDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TwoFactorAuthDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TwoFactorAuthDto>(null as any);
+    }
+}
+
+@Injectable()
+export class UserMicroServicesServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param usernameOrEmailAddress (optional) 
+     * @param password (optional) 
+     * @return Success
+     */
+    login(usernameOrEmailAddress: string | undefined, password: string | undefined): Observable<LoginResult> {
+        let url_ = this.baseUrl + "/api/UserMicroServices/Login?";
+        if (usernameOrEmailAddress === null)
+            throw new Error("The parameter 'usernameOrEmailAddress' cannot be null.");
+        else if (usernameOrEmailAddress !== undefined)
+            url_ += "usernameOrEmailAddress=" + encodeURIComponent("" + usernameOrEmailAddress) + "&";
+        if (password === null)
+            throw new Error("The parameter 'password' cannot be null.");
+        else if (password !== undefined)
+            url_ += "password=" + encodeURIComponent("" + password) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLogin(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LoginResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LoginResult>;
+        }));
+    }
+
+    protected processLogin(response: HttpResponseBase): Observable<LoginResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LoginResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<LoginResult>(null as any);
+    }
+
+    /**
+     * @param usernameOrEmailAddress (optional) 
+     * @return Success
+     */
+    getUserByUsernameOrEmailAddress(usernameOrEmailAddress: string | undefined): Observable<User> {
+        let url_ = this.baseUrl + "/api/UserMicroServices/GetUserByUsernameOrEmailAddress?";
+        if (usernameOrEmailAddress === null)
+            throw new Error("The parameter 'usernameOrEmailAddress' cannot be null.");
+        else if (usernameOrEmailAddress !== undefined)
+            url_ += "usernameOrEmailAddress=" + encodeURIComponent("" + usernameOrEmailAddress) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserByUsernameOrEmailAddress(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserByUsernameOrEmailAddress(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<User>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<User>;
+        }));
+    }
+
+    protected processGetUserByUsernameOrEmailAddress(response: HttpResponseBase): Observable<User> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = User.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<User>(null as any);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    getUserById(userId: number | undefined): Observable<User> {
+        let url_ = this.baseUrl + "/api/UserMicroServices/GetUserById?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<User>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<User>;
+        }));
+    }
+
+    protected processGetUserById(response: HttpResponseBase): Observable<User> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = User.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<User>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getUsersList(): Observable<User[]> {
+        let url_ = this.baseUrl + "/api/UserMicroServices/GetUsersList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUsersList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUsersList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<User[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<User[]>;
+        }));
+    }
+
+    protected processGetUsersList(response: HttpResponseBase): Observable<User[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(User.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<User[]>([null as any]);
+    }
+
+    /**
+     * @param isTwoFactorEnabled (optional) 
+     * @param userId (optional) 
+     * @return Success
+     */
+    updateUser(isTwoFactorEnabled: boolean | undefined, userId: number | undefined): Observable<User> {
+        let url_ = this.baseUrl + "/api/UserMicroServices/UpdateUser?";
+        if (isTwoFactorEnabled === null)
+            throw new Error("The parameter 'isTwoFactorEnabled' cannot be null.");
+        else if (isTwoFactorEnabled !== undefined)
+            url_ += "IsTwoFactorEnabled=" + encodeURIComponent("" + isTwoFactorEnabled) + "&";
         if (userId === null)
             throw new Error("The parameter 'userId' cannot be null.");
         else if (userId !== undefined)
@@ -235,20 +590,20 @@ export class TwoFactorAuthServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDisableTwoFactorAuthentication(response_);
+            return this.processUpdateUser(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDisableTwoFactorAuthentication(response_ as any);
+                    return this.processUpdateUser(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<TwoFactorsAuthDto>;
+                    return _observableThrow(e) as any as Observable<User>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<TwoFactorsAuthDto>;
+                return _observableThrow(response_) as any as Observable<User>;
         }));
     }
 
-    protected processDisableTwoFactorAuthentication(response: HttpResponseBase): Observable<TwoFactorsAuthDto> {
+    protected processUpdateUser(response: HttpResponseBase): Observable<User> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -259,7 +614,7 @@ export class TwoFactorAuthServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = TwoFactorsAuthDto.fromJS(resultData200);
+            result200 = User.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -267,7 +622,7 @@ export class TwoFactorAuthServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<TwoFactorsAuthDto>(null as any);
+        return _observableOf<User>(null as any);
     }
 }
 
@@ -389,13 +744,11 @@ export interface IAuthenticateResultModel {
     twoFactorPin: number | undefined;
 }
 
-export class TwoFactorsAuthDto implements ITwoFactorsAuthDto {
-    userId: number;
-    userName: string | undefined;
-    twoFactorSecretKey: string | undefined;
-    twoFactorQrImgUrl: string | undefined;
+export class LoginResult implements ILoginResult {
+    result: LoginResultType;
+    user: User;
 
-    constructor(data?: ITwoFactorsAuthDto) {
+    constructor(data?: ILoginResult) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -406,6 +759,112 @@ export class TwoFactorsAuthDto implements ITwoFactorsAuthDto {
 
     init(_data?: any) {
         if (_data) {
+            this.result = _data["result"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): LoginResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["result"] = this.result;
+        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): LoginResult {
+        const json = this.toJSON();
+        let result = new LoginResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILoginResult {
+    result: LoginResultType;
+    user: User;
+}
+
+export enum LoginResultType {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+}
+
+export class Role implements IRole {
+    id: number;
+    name: string | undefined;
+
+    constructor(data?: IRole) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Role {
+        data = typeof data === 'object' ? data : {};
+        let result = new Role();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): Role {
+        const json = this.toJSON();
+        let result = new Role();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRole {
+    id: number;
+    name: string | undefined;
+}
+
+export class TwoFactorAuthDto implements ITwoFactorAuthDto {
+    id: string;
+    userId: number;
+    userName: string | undefined;
+    twoFactorSecretKey: string | undefined;
+    twoFactorQrImgUrl: string | undefined;
+
+    constructor(data?: ITwoFactorAuthDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
             this.userId = _data["userId"];
             this.userName = _data["userName"];
             this.twoFactorSecretKey = _data["twoFactorSecretKey"];
@@ -413,15 +872,16 @@ export class TwoFactorsAuthDto implements ITwoFactorsAuthDto {
         }
     }
 
-    static fromJS(data: any): TwoFactorsAuthDto {
+    static fromJS(data: any): TwoFactorAuthDto {
         data = typeof data === 'object' ? data : {};
-        let result = new TwoFactorsAuthDto();
+        let result = new TwoFactorAuthDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["userId"] = this.userId;
         data["userName"] = this.userName;
         data["twoFactorSecretKey"] = this.twoFactorSecretKey;
@@ -429,19 +889,87 @@ export class TwoFactorsAuthDto implements ITwoFactorsAuthDto {
         return data;
     }
 
-    clone(): TwoFactorsAuthDto {
+    clone(): TwoFactorAuthDto {
         const json = this.toJSON();
-        let result = new TwoFactorsAuthDto();
+        let result = new TwoFactorAuthDto();
         result.init(json);
         return result;
     }
 }
 
-export interface ITwoFactorsAuthDto {
+export interface ITwoFactorAuthDto {
+    id: string;
     userId: number;
     userName: string | undefined;
     twoFactorSecretKey: string | undefined;
     twoFactorQrImgUrl: string | undefined;
+}
+
+export class User implements IUser {
+    id: number;
+    roleId: number;
+    role: Role;
+    userName: string | undefined;
+    emailAddress: string | undefined;
+    password: string | undefined;
+    isTwoFactorEnabled: boolean;
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.roleId = _data["roleId"];
+            this.role = _data["role"] ? Role.fromJS(_data["role"]) : <any>undefined;
+            this.userName = _data["userName"];
+            this.emailAddress = _data["emailAddress"];
+            this.password = _data["password"];
+            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["roleId"] = this.roleId;
+        data["role"] = this.role ? this.role.toJSON() : <any>undefined;
+        data["userName"] = this.userName;
+        data["emailAddress"] = this.emailAddress;
+        data["password"] = this.password;
+        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
+        return data;
+    }
+
+    clone(): User {
+        const json = this.toJSON();
+        let result = new User();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUser {
+    id: number;
+    roleId: number;
+    role: Role;
+    userName: string | undefined;
+    emailAddress: string | undefined;
+    password: string | undefined;
+    isTwoFactorEnabled: boolean;
 }
 
 export class ApiException extends Error {

@@ -1,9 +1,9 @@
 <nav>
   <div>
-    <a routerLink="/login">Login</a>
+    <a routerLink="/home" *ngIf="isLoggedIn">Home</a>
   </div>
   <div>
-    <a routerLink="/register">Register</a>
+    <a routerLink="/login" *ngIf="!isLoggedIn">Login</a>
   </div>
 </nav>
 <router-outlet></router-outlet>

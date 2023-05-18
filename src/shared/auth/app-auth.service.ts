@@ -57,7 +57,7 @@ export class AppAuthService {
       this.authenticateResult.require2fa &&
       this.authenticateModel.twoFactorPin == null
     ) {
-      this._router.navigate(['two-way-auth']);
+      this._router.navigate(['two-factor-auth-page']);
     } else {
       if (authenticateResult.accessToken) {
         this.login(
@@ -79,7 +79,7 @@ export class AppAuthService {
     expireInSeconds: number,
     rememberMe?: boolean
   ): void {
-    const tokenExpireDate = rememberMe ? new Date(new Date().getTime() + 1000 * expireInSeconds) : undefined;
+    const tokenExpireDate = new Date(new Date().getTime() + 1000 * expireInSeconds);
 
     this._cookieService.setCookieValue("accessToken", accessToken, tokenExpireDate);
     this._cookieService.setCookieValue(AppConsts.authorization.encryptedAuthTokenName, encryptedAccessToken, tokenExpireDate);

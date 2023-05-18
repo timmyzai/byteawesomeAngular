@@ -1,15 +1,17 @@
-<div>
-    <h1>Welcome to the Home Page!</h1>
-    <p>You have been logged in.</p>
-    <button (click)="logout()">Logout</button>
-</div>
+<div [@routerTransition]>
+    <div>
+        <h1>Welcome to the Home Page!</h1>
+        <p>You have been logged in.</p>
+        <button (click)="logout()">Logout</button>
+    </div>
 
-<div>
-    <p>Setup Two Factors Auth</p>
-    <button (click)="twoFactorSetup()">Setup 2FA</button>
-</div>
+    <div>
+        <p>Setup Two Factors Auth</p>
+        <button (click)="twoFactorSetup()">Setup 2FA</button>
+    </div>
 
-<div>
-    <p>Test Two Factors Auth Modal</p>
-    <button (click)="secret()">Open Secret</button>
+    <div>
+        <p>Test Two Factors Auth Modal</p>
+        <button (click)="secret()">Open Secret</button>
+    </div>
 </div>

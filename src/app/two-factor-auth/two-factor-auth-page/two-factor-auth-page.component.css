@@ -1,28 +1,14 @@
-.modal-header .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    font-size: 20px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
+.page-content {
+    padding: 20px;
 }
 
-.modal-header .close-button:hover {
-    color: #ff0000;
+.page-header {
+    margin-bottom: 20px;
 }
 
-.modal-body {
+.page-body {
     display: flex;
     justify-content: center;
-    align-items: center;
-}
-
-.centered {
-    display: flex;
-    flex-direction: column;
     align-items: center;
 }
 
@@ -67,13 +53,16 @@
     border-color: #007bff;
 }
 
-.form-group.row {
-    margin-top: 20px;
+
+.error-message {
+    color: red;
+    margin-bottom: 20px;
 }
 
-.btn-primary {
-    display: block;
-    margin: 0 auto;
+.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .error-message {
@@ -85,18 +74,10 @@
     margin-top: 10px;
 }
 
-.back-button {
-    background-color: #ccc;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-bottom: 10px;
+.two-factor-auth-page {
+    position: relative;
 }
 
-.back-button-text {
-    font-size: 16px;
-}
-
-.back-button:hover {
-    background-color: #aaa;
+.button-spacing {
+    margin-right: 10px;
 }

@@ -1,39 +1,72 @@
 import { Component, OnInit } from '@angular/core';
-import { TwoFactorAuthServiceProxy, TwoFactorsAuthDto } from 'src/shared/service-proxies/service-proxies';
+import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
+import { TwoFactorAuthServiceProxy, TwoFactorAuthDto, User, UserMicroServicesServiceProxy } from 'src/shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-two-factor-auth-setup',
   templateUrl: './two-factor-auth-setup.component.html',
-  styleUrls: ['./two-factor-auth-setup.component.css']
+  styleUrls: ['./two-factor-auth-setup.component.css'],
+  animations: [accountModuleAnimation()]
 })
-export class TwoFactorAuthSetupComponent implements OnInit{
+export class TwoFactorAuthSetupComponent implements OnInit {
+  saving = false;
+  authDetails = new TwoFactorAuthDto();
+  isTwoFactorEnabled = false;
+  serial = '';
+  isPageLoading = true;
+  user: User;
 
   constructor(
-    private _twoFactorAuthService: TwoFactorAuthServiceProxy,
-  ) {
-  }
-  saving = false;
-  authDetails = new TwoFactorsAuthDto();
-  isTwoFactorEnableValue: boolean = undefined;
-  shownLoginName = '';
-  serial = '';
-  isPageLoading: boolean = false;
-  userId: number = 123;
+    private twoFactorAuthService: TwoFactorAuthServiceProxy,
+    private userMicroServices: UserMicroServicesServiceProxy
+  ) { }
 
   ngOnInit(): void {
-    this.isPageLoading = true;
+    this.getUserTwoFactorStatus();
   }
 
-  Enable(): void {
-    this._twoFactorAuthService.enableTwoFactorAuthentication(this.userId).subscribe(
-      (result: TwoFactorsAuthDto) => {
-        this.authDetails = result;
-        var secretKey = result.twoFactorSecretKey;
-        this.shownLoginName = result.userName;
-        this.serial = secretKey.substring(0,4) + "-" + secretKey.substring(4,8) + "-" + secretKey.substring(8,12) + "-" + secretKey.substring(12,16);
-      }
-    )
+  private async getUserTwoFactorStatus(): Promise<void> {
+    try {
+      this.isPageLoading = true;
+      const userId = 1;
+      this.user = await this.userMicroServices.getUserById(userId).toPromise();
+      this.isTwoFactorEnabled = this.user.isTwoFactorEnabled;
+      await this.getTwoFactorAuthInfo();
+    } finally {
+      this.isPageLoading = false;
+    }
   }
-  Disable(): void {
+
+  async toggleTwoFactor(): Promise<void> {
+    try {
+      this.isPageLoading = true;
+      this.isTwoFactorEnabled = !this.isTwoFactorEnabled;
+
+      await this.userMicroServices.updateUser(this.isTwoFactorEnabled, this.user.id).toPromise();
+      if (this.isTwoFactorEnabled) {
+        await this.enableTwoFactorAuth();
+      } else {
+        await this.disableTwoFactorAuth();
+      }
+    } finally {
+      this.isPageLoading = false;
+    }
+  }
+
+  private async getTwoFactorAuthInfo(): Promise<void> {
+    const result: TwoFactorAuthDto = await this.twoFactorAuthService.getTwoFactorAuthInfo(this.user.id).toPromise();
+    this.authDetails = result;
+    this.serial = result.twoFactorSecretKey.match(/.{4}/g).join('-');
+  } 
+
+  private async enableTwoFactorAuth(): Promise<void> {
+    const result: TwoFactorAuthDto = await this.twoFactorAuthService.enableTwoFactorAuthentication().toPromise();
+    this.authDetails = result;
+    this.serial = result.twoFactorSecretKey.match(/.{4}/g).join('-');
+  }
+  private async disableTwoFactorAuth(): Promise<void> {
+    const result: TwoFactorAuthDto = await this.twoFactorAuthService.disableTwoFactorAuthentication(this.authDetails).toPromise();
+    this.authDetails = result;
+    this.serial = "";
   }
 }
