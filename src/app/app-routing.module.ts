@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'two-factor-auth-setup', component: TwoFactorAuthSetupComponent },
   { path: 'two-factor-auth-page', component: TwoFactorAuthPageComponent },
   { path: 'secret-place', component: SecretPlaceComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
 

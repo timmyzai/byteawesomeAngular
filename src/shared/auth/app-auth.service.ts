@@ -34,27 +34,21 @@ export class AppAuthService {
     }
   }
 
-  authenticate(finallyCallback?: () => void): void {
-    finallyCallback = finallyCallback || (() => { });
-
+  authenticate(finallyCallback: () => void): void {
     this._tokenAuthService.authenticate(this.authenticateModel)
       .pipe(
-        finalize(() => {
-          finallyCallback();
-        })
+        finalize(finallyCallback)
       )
       .subscribe((result: AuthenticateResultModel) => {
         this.processAuthenticateResult(result);
       });
   }
-
-  private processAuthenticateResult(
-    authenticateResult: AuthenticateResultModel
-  ) {
+  
+  private processAuthenticateResult(authenticateResult: AuthenticateResultModel): void {
     const require2fa = authenticateResult.require2fa;
     const twoFactorPin = this.authenticateModel.twoFactorPin;
-    
-    if (require2fa && twoFactorPin === null) {
+
+    if (require2fa && twoFactorPin == null) {
       this._router.navigate(['two-factor-auth-page']);
       return;
     }
