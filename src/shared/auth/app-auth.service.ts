@@ -51,25 +51,23 @@ export class AppAuthService {
   private processAuthenticateResult(
     authenticateResult: AuthenticateResultModel
   ) {
-    this.authenticateResult = authenticateResult;
-
-    if (
-      this.authenticateResult.require2fa &&
-      this.authenticateModel.twoFactorPin == null
-    ) {
+    const require2fa = authenticateResult.require2fa;
+    const twoFactorPin = this.authenticateModel.twoFactorPin;
+    
+    if (require2fa && twoFactorPin === null) {
       this._router.navigate(['two-factor-auth-page']);
+      return;
+    }
+
+    const accessToken = authenticateResult.accessToken;
+    const encryptedAccessToken = authenticateResult.encryptedAccessToken;
+    const expireInSeconds = authenticateResult.expireInSeconds;
+
+    if (accessToken) {
+      this.login(accessToken, encryptedAccessToken, expireInSeconds, this.rememberMe);
     } else {
-      if (authenticateResult.accessToken) {
-        this.login(
-          authenticateResult.accessToken,
-          authenticateResult.encryptedAccessToken,
-          authenticateResult.expireInSeconds,
-          this.rememberMe
-        );
-      } else {
-        console.error('Unexpected authenticateResult!');
-        this._router.navigate(['login']);
-      }
+      console.error('Unexpected authenticateResult!');
+      this._router.navigate(['login']);
     }
   }
 

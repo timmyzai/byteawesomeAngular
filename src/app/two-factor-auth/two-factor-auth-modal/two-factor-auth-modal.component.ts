@@ -21,6 +21,7 @@ export class TwoFactorAuthModalComponent {
   }
 
   hideModal() {
+    this.validateTwoFactorResult.emit(false); 
     this._bsModalRef.hide();
   }
 

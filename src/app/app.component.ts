@@ -26,6 +26,10 @@ export class AppComponent implements OnInit {
 
     if (accessToken && encryptedAccessToken) {
       this.isLoggedIn = true;
+      if (window.location.href.includes("login")) {
+        this.route.navigate(["home"]);
+      }
+
     } else {
       this.route.navigate(["login"]);
     }

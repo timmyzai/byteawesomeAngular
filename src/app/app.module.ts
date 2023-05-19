@@ -17,8 +17,10 @@ import { TwoFactorAuthModalComponent } from './two-factor-auth/two-factor-auth-m
 import { SecretPlaceComponent } from './secret-place/secret-place.component';
 import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-setup/two-factor-auth-setup.component';
 
-import { ModalModule,BsModalService } from 'ngx-bootstrap/modal';
+import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';
 import { TwoFactorAuthPageComponent } from './two-factor-auth/two-factor-auth-page/two-factor-auth-page.component';
+import { ToastrModule } from 'ngx-toastr'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,7 +38,11 @@ import { TwoFactorAuthPageComponent } from './two-factor-auth/two-factor-auth-pa
     FormsModule,
     ServiceProxyModule,
     HttpClientModule,
-    ModalModule
+    ModalModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-bottom-right',
+      closeButton: true,
+    })
   ],
   providers: [
     AppAuthService,

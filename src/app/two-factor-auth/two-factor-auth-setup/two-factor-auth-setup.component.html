@@ -21,7 +21,7 @@
                                         <span class="enable-label">{{"Enable"}}</span>
                                         <label class="switch">
                                             <input id="twoFactorCheckbox" type="checkbox" (change)="toggleTwoFactor()"
-                                                [checked]="!isTwoFactorEnabled">
+                                                [checked]="!isToggleTrue">
                                             <span class="slider round"></span>
                                         </label>
                                         <span class="disable-label">{{"Disable"}}</span>
@@ -29,7 +29,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-4 justify-content-center" *ngIf="isTwoFactorEnabled">
+                            <div class="row mt-4 justify-content-center" *ngIf="!errorMsg">
                                 <div class="col-5 rounded auth-key-container">
                                     <h5 class="my-2 text-center font-weight-bold">{{ "WriteDownAuthKey" }}</h5><br>
                                     <h5 class="text-center mt-2 auth-key">{{serial}}</h5>

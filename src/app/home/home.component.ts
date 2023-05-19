@@ -21,7 +21,7 @@ export class HomeComponent {
   ) {
   }
 
-  isTwoFactorEnabled: boolean;
+  isToggleTrue: boolean;
 
   ngOnInit(): void {
   }
@@ -43,9 +43,9 @@ export class HomeComponent {
     const userId = 1;
     this._userMicroServices.getUserById(userId).subscribe(
       (result: User) => {
-        this.isTwoFactorEnabled = result.isTwoFactorEnabled;
+        this.isToggleTrue = result.isTwoFactorEnabled;
 
-        if (this.isTwoFactorEnabled) {
+        if (this.isToggleTrue) {
           this.showTwoFactorAuthModal();
         }
       }
