@@ -2,7 +2,7 @@ import { Component, EventEmitter, } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
 import { AppAuthService } from 'src/shared/auth/app-auth.service';
-import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/service-proxies';
+import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/auth-service-proxies';
 
 @Component({
   selector: 'app-two-factor-auth-page',

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { TwoFactorAuthServiceProxy, TwoFactorAuthDto, User, UserMicroServicesServiceProxy } from 'src/shared/service-proxies/service-proxies';
+import { TwoFactorAuthServiceProxy, TwoFactorAuthDto } from 'src/shared/service-proxies/auth-service-proxies';
+import { UserDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
 import { TwoFactorAuthModalComponent } from '../two-factor-auth-modal/two-factor-auth-modal.component';
 import { NotifyServices } from 'src/shared/services/notify-services';
+
 @Component({
   selector: 'app-two-factor-auth-setup',
   templateUrl: './two-factor-auth-setup.component.html',
@@ -11,18 +13,18 @@ import { NotifyServices } from 'src/shared/services/notify-services';
   animations: [accountModuleAnimation()]
 })
 export class TwoFactorAuthSetupComponent implements OnInit {
-  authDetails = new TwoFactorAuthDto();
-  user: User;
+  authDetails: TwoFactorAuthDto = new TwoFactorAuthDto();
+  user: UserDto;
   serial = '';
-  isToggleTrue: boolean = false;
-  isPageLoading: boolean = true;
+  isToggled = false;
+  isPageLoading = true;
   errorMsg: string = undefined;
 
   constructor(
     private twoFactorAuthService: TwoFactorAuthServiceProxy,
-    private userMicroServices: UserMicroServicesServiceProxy,
-    private _modalService: BsModalService,
-    private _notify: NotifyServices
+    private userServices: UserServiceProxy,
+    private modalService: BsModalService,
+    private notify: NotifyServices
   ) { }
 
   ngOnInit(): void {
@@ -33,9 +35,9 @@ export class TwoFactorAuthSetupComponent implements OnInit {
     try {
       this.isPageLoading = true;
       const userId = 1;
-      this.user = await this.userMicroServices.getUserById(userId).toPromise();
-      this.isToggleTrue = this.user.isTwoFactorEnabled;
-      await this.generateTwoFactorAuth();
+      this.user = await this.userServices.getById(userId).toPromise();
+      this.isToggled = this.user.isTwoFactorEnabled;
+      await this.generateTwoFactorAuth(this.user);
     } finally {
       this.isPageLoading = false;
     }
@@ -44,9 +46,9 @@ export class TwoFactorAuthSetupComponent implements OnInit {
   async toggleTwoFactor(): Promise<void> {
     try {
       this.isPageLoading = true;
-      this.isToggleTrue = !this.isToggleTrue;
-      if(this.errorMsg){
-        this._notify.showError(`${this.errorMsg}`, 'Generate 2FA Error', 5);
+      this.isToggled = !this.isToggled;
+      if (this.errorMsg) {
+        this.notify.showError(`${this.errorMsg}`, 'Generate 2FA Error', 5);
         return;
       }
       this.showTwoFactorAuthModal();
@@ -56,26 +58,29 @@ export class TwoFactorAuthSetupComponent implements OnInit {
   }
 
   showTwoFactorAuthModal(): void {
-    const modalRef: BsModalRef = this._modalService.show(TwoFactorAuthModalComponent);
+    const modalRef: BsModalRef = this.modalService.show(TwoFactorAuthModalComponent);
     modalRef.content.validateTwoFactorResult.subscribe(async (bool: boolean) => {
       if (bool) {
-        await this.userMicroServices.updateUser(this.isToggleTrue, this.user.id).toPromise();
-        await this.generateTwoFactorAuth();
-        this._notify.showSuccess('You have activated 2FA', 'Success', 5);
+        this.user.isTwoFactorEnabled = this.isToggled;
+        this.user = await this.userServices.update(this.user).toPromise();
+        await this.generateTwoFactorAuth(this.user);
       } else {
-        this.isToggleTrue = !this.isToggleTrue;
+        this.isToggled = !this.isToggled;
       }
     });
   }
 
-  private async generateTwoFactorAuth(): Promise<void> {
+  private async generateTwoFactorAuth(user: UserDto): Promise<void> {
     try {
-      const result: TwoFactorAuthDto = await this.twoFactorAuthService.generateTwoFactorAuthentication().toPromise();
+      const result = await this.twoFactorAuthService.generateTwoFactorAuthentication(user).toPromise();
       this.authDetails = result;
       this.serial = result.twoFactorSecretKey.match(/.{4}/g).join('-');
+      if (this.isPageLoading == false) {
+        this.notify.showSuccess(`You have ${this.user.isTwoFactorEnabled ? 'activated' : 'deactivated'} 2FA`, 'Success', 5);
+      }
     } catch (error) {
       this.errorMsg = error;
-      this._notify.showError(`${error}`, 'Generate 2FA Error', 5);
+      this.notify.showError(`${error}`, 'Generate 2FA Error', 5);
     }
   }
 }

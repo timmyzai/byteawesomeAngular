@@ -1,4 +1,5 @@
 {
   "appBaseUrl": "http://localhost:4200",
-  "remoteServiceBaseUrl": "https://localhost:7183"
+  "remoteAuthServiceBaseUrl": "https://localhost:7183",
+  "remoteUserServiceBaseUrl": "http://localhost:7181"
 }

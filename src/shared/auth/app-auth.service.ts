@@ -2,11 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from 'src/shared/AppConsts';
-import {
-  AuthenticateModel,
-  AuthenticateResultModel,
-  AuthenticationServiceProxy,
-} from 'src/shared/service-proxies/service-proxies';
+import { AuthenticateModel, AuthenticateResultModel, AuthenticationServiceProxy, } from 'src/shared/service-proxies/auth-service-proxies';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { CookiesService } from '../services/cookies.service';
 
@@ -43,7 +39,7 @@ export class AppAuthService {
         this.processAuthenticateResult(result);
       });
   }
-  
+
   private processAuthenticateResult(authenticateResult: AuthenticateResultModel): void {
     const require2fa = authenticateResult.require2fa;
     const twoFactorPin = this.authenticateModel.twoFactorPin;

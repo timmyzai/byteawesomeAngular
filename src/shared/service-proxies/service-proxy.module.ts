@@ -1,14 +1,16 @@
 import { NgModule } from '@angular/core';
 
-import * as ApiServiceProxies from './service-proxies';
+import * as AuthApiServiceProxies from './auth-service-proxies';
+import * as UserApiServiceProxies from './user-service-proxies';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './TokenInterceptor';
 
 @NgModule({
     providers: [
-        ApiServiceProxies.AuthenticationServiceProxy,
-        ApiServiceProxies.TwoFactorAuthServiceProxy,
-        ApiServiceProxies.UserMicroServicesServiceProxy,
+        AuthApiServiceProxies.AuthenticationServiceProxy,
+        AuthApiServiceProxies.TwoFactorAuthServiceProxy,
+        UserApiServiceProxies.RolesServiceProxy,
+        UserApiServiceProxies.UserServiceProxy,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: TokenInterceptor,

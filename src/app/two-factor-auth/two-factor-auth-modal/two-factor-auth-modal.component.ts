@@ -1,6 +1,6 @@
 import { Component, EventEmitter, } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/service-proxies';
+import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/auth-service-proxies';
 @Component({
   selector: 'app-two-factor-auth-modal',
   templateUrl: './two-factor-auth-modal.component.html',

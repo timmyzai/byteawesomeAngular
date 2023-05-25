@@ -11,7 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppInitializer } from 'src/app-initializer';
 import { AppConsts } from 'src/shared/AppConsts';
-import { API_BASE_URL } from 'src/shared/service-proxies/service-proxies';
+import { AUTH_API_BASE_URL } from 'src/shared/service-proxies/auth-service-proxies';
+import { USER_API_BASE_URL } from 'src/shared/service-proxies/user-service-proxies';
 import { HomeComponent } from './home/home.component';
 import { TwoFactorAuthModalComponent } from './two-factor-auth/two-factor-auth-modal/two-factor-auth-modal.component';
 import { SecretPlaceComponent } from './secret-place/secret-place.component';
@@ -52,7 +53,8 @@ import { ToastrModule } from 'ngx-toastr'
       deps: [AppInitializer],
       multi: true,
     },
-    { provide: API_BASE_URL, useFactory: () => AppConsts.remoteServiceBaseUrl },
+    { provide: AUTH_API_BASE_URL, useFactory: () => AppConsts.remoteAuthServiceBaseUrl },
+    { provide: USER_API_BASE_URL, useFactory: () => AppConsts.remoteUserServiceBaseUrl },
     BsModalService
   ],
   bootstrap: [
