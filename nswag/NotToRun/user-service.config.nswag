@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://localhost:7183/swagger/v1/swagger.json",
+      "url": "https://localhost:7181/swagger/v1/swagger.json",
       "output": null
     }
   },
@@ -52,7 +52,7 @@
       "convertConstructorInterfaceData": false,
       "importRequiredTypes": true,
       "useGetBaseUrlMethod": false,
-      "baseUrlTokenName": "API_BASE_URL",
+      "baseUrlTokenName": "USER_API_BASE_URL",
       "queryNullValue": "",
       "inlineNamedDictionaries": false,
       "inlineNamedAny": false,
@@ -62,7 +62,7 @@
       "enumNameGeneratorType": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../src/shared/service-proxies/service-proxies.ts"
+      "output": "../src/shared/service-proxies/user-service-proxies.ts"
     },
     "openApiToCSharpClient": {
       "clientBaseClass": null,
