@@ -1,6 +1,7 @@
 export class AppConsts {
     static remoteAuthServiceBaseUrl: string;
     static remoteUserServiceBaseUrl: string;
+    static remoteWalletServiceBaseUrl: string;
     static appBaseUrl: string;
 
     static readonly authorization = {

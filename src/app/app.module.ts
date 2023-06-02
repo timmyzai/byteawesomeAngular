@@ -13,6 +13,7 @@ import { AppInitializer } from 'src/app-initializer';
 import { AppConsts } from 'src/shared/AppConsts';
 import { AUTH_API_BASE_URL } from 'src/shared/service-proxies/auth-service-proxies';
 import { USER_API_BASE_URL } from 'src/shared/service-proxies/user-service-proxies';
+import { WALLET_API_BASE_URL } from 'src/shared/service-proxies/wallet-service-proxies';
 import { HomeComponent } from './home/home.component';
 import { TwoFactorAuthModalComponent } from './two-factor-auth/two-factor-auth-modal/two-factor-auth-modal.component';
 import { SecretPlaceComponent } from './secret-place/secret-place.component';
@@ -20,7 +21,9 @@ import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-s
 
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';
 import { TwoFactorAuthPageComponent } from './two-factor-auth/two-factor-auth-page/two-factor-auth-page.component';
-import { ToastrModule } from 'ngx-toastr'
+import { ToastrModule } from 'ngx-toastr';
+import { WalletGroupComponent } from './wallet-group/wallet-group.component';
+import { WalletComponent } from './wallet/wallet.component'
 
 @NgModule({
   declarations: [
@@ -30,7 +33,9 @@ import { ToastrModule } from 'ngx-toastr'
     TwoFactorAuthModalComponent,
     SecretPlaceComponent,
     TwoFactorAuthSetupComponent,
-    TwoFactorAuthPageComponent
+    TwoFactorAuthPageComponent,
+    WalletGroupComponent,
+    WalletComponent
   ],
   imports: [
     BrowserModule,
@@ -55,6 +60,7 @@ import { ToastrModule } from 'ngx-toastr'
     },
     { provide: AUTH_API_BASE_URL, useFactory: () => AppConsts.remoteAuthServiceBaseUrl },
     { provide: USER_API_BASE_URL, useFactory: () => AppConsts.remoteUserServiceBaseUrl },
+    { provide: WALLET_API_BASE_URL, useFactory: () => AppConsts.remoteWalletServiceBaseUrl },
     BsModalService
   ],
   bootstrap: [

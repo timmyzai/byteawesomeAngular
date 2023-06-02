@@ -15,15 +15,15 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 import { DateTime, Duration } from "luxon";
 
-export const USER_API_BASE_URL = new InjectionToken<string>('USER_API_BASE_URL');
+export const WALLET_API_BASE_URL = new InjectionToken<string>('WALLET_API_BASE_URL');
 
 @Injectable()
-export class RoleServiceProxy {
+export class NetworkServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(USER_API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
@@ -31,8 +31,8 @@ export class RoleServiceProxy {
     /**
      * @return Success
      */
-    get(): Observable<RolesDtoIEnumerableResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/Get";
+    get(): Observable<NetworkDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/Get";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -50,14 +50,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processGet(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoIEnumerableResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoIEnumerableResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoIEnumerableResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoIEnumerableResponseDto>;
         }));
     }
 
-    protected processGet(response: HttpResponseBase): Observable<RolesDtoIEnumerableResponseDto> {
+    protected processGet(response: HttpResponseBase): Observable<NetworkDtoIEnumerableResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -68,7 +68,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoIEnumerableResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoIEnumerableResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -76,14 +76,14 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoIEnumerableResponseDto>(null as any);
+        return _observableOf<NetworkDtoIEnumerableResponseDto>(null as any);
     }
 
     /**
      * @return Success
      */
-    getById(id: number): Observable<RolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/GetById/{id}";
+    getById(id: number): Observable<NetworkDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/GetById/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -104,14 +104,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processGetById(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
         }));
     }
 
-    protected processGetById(response: HttpResponseBase): Observable<RolesDtoResponseDto> {
+    protected processGetById(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -122,7 +122,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -130,15 +130,15 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoResponseDto>(null as any);
+        return _observableOf<NetworkDtoResponseDto>(null as any);
     }
 
     /**
      * @param body (optional) 
      * @return Success
      */
-    add(body: CreateRolesDto | undefined): Observable<RolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/Add";
+    add(body: CreateNetworksDto | undefined): Observable<NetworkDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/Add";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -160,14 +160,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processAdd(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
         }));
     }
 
-    protected processAdd(response: HttpResponseBase): Observable<RolesDtoResponseDto> {
+    protected processAdd(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -178,7 +178,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -186,15 +186,15 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoResponseDto>(null as any);
+        return _observableOf<NetworkDtoResponseDto>(null as any);
     }
 
     /**
      * @param body (optional) 
      * @return Success
      */
-    update(body: RolesDto | undefined): Observable<RolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/Update";
+    update(body: NetworkDto | undefined): Observable<NetworkDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/Update";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -216,14 +216,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processUpdate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
         }));
     }
 
-    protected processUpdate(response: HttpResponseBase): Observable<RolesDtoResponseDto> {
+    protected processUpdate(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -234,7 +234,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -242,14 +242,14 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoResponseDto>(null as any);
+        return _observableOf<NetworkDtoResponseDto>(null as any);
     }
 
     /**
      * @return Success
      */
-    delete(id: number): Observable<RolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/Delete/{id}";
+    delete(id: number): Observable<NetworkDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -270,14 +270,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processDelete(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
         }));
     }
 
-    protected processDelete(response: HttpResponseBase): Observable<RolesDtoResponseDto> {
+    protected processDelete(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -288,7 +288,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -296,7 +296,7 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoResponseDto>(null as any);
+        return _observableOf<NetworkDtoResponseDto>(null as any);
     }
 
     /**
@@ -304,8 +304,8 @@ export class RoleServiceProxy {
      * @param pageSize (optional) 
      * @return Success
      */
-    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<RolesDtoPagedListResponseDto> {
-        let url_ = this.baseUrl + "/api/Role/GetAll?";
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<NetworkDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/Network/GetAll?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -331,14 +331,14 @@ export class RoleServiceProxy {
                 try {
                     return this.processGetAll(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RolesDtoPagedListResponseDto>;
+                    return _observableThrow(e) as any as Observable<NetworkDtoPagedListResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RolesDtoPagedListResponseDto>;
+                return _observableThrow(response_) as any as Observable<NetworkDtoPagedListResponseDto>;
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<RolesDtoPagedListResponseDto> {
+    protected processGetAll(response: HttpResponseBase): Observable<NetworkDtoPagedListResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -349,7 +349,7 @@ export class RoleServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RolesDtoPagedListResponseDto.fromJS(resultData200);
+            result200 = NetworkDtoPagedListResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -357,17 +357,17 @@ export class RoleServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<RolesDtoPagedListResponseDto>(null as any);
+        return _observableOf<NetworkDtoPagedListResponseDto>(null as any);
     }
 }
 
 @Injectable()
-export class UserServiceProxy {
+export class WalletServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(USER_API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
@@ -376,8 +376,8 @@ export class UserServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    add(body: CreateUserDto | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/Add";
+    add(body: CreateWalletDto | undefined): Observable<WalletDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/Add";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -399,14 +399,14 @@ export class UserServiceProxy {
                 try {
                     return this.processAdd(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<WalletDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<UserDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<WalletDtoResponseDto>;
         }));
     }
 
-    protected processAdd(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processAdd(response: HttpResponseBase): Observable<WalletDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -417,7 +417,7 @@ export class UserServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoResponseDto.fromJS(resultData200);
+            result200 = WalletDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -425,181 +425,15 @@ export class UserServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<UserDtoResponseDto>(null as any);
-    }
-
-    /**
-     * @param usernameOrEmailAddress (optional) 
-     * @param password (optional) 
-     * @return Success
-     */
-    validateUserCredentials(usernameOrEmailAddress: string | undefined, password: string | undefined): Observable<LoginResultDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/ValidateUserCredentials?";
-        if (usernameOrEmailAddress === null)
-            throw new Error("The parameter 'usernameOrEmailAddress' cannot be null.");
-        else if (usernameOrEmailAddress !== undefined)
-            url_ += "usernameOrEmailAddress=" + encodeURIComponent("" + usernameOrEmailAddress) + "&";
-        if (password === null)
-            throw new Error("The parameter 'password' cannot be null.");
-        else if (password !== undefined)
-            url_ += "password=" + encodeURIComponent("" + password) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processValidateUserCredentials(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processValidateUserCredentials(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<LoginResultDtoResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<LoginResultDtoResponseDto>;
-        }));
-    }
-
-    protected processValidateUserCredentials(response: HttpResponseBase): Observable<LoginResultDtoResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = LoginResultDtoResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<LoginResultDtoResponseDto>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    get(): Observable<UserDtoIEnumerableResponseDto> {
-        let url_ = this.baseUrl + "/api/User/Get";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGet(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoIEnumerableResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<UserDtoIEnumerableResponseDto>;
-        }));
-    }
-
-    protected processGet(response: HttpResponseBase): Observable<UserDtoIEnumerableResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoIEnumerableResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<UserDtoIEnumerableResponseDto>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    getById(id: number): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/GetById/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetById(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<UserDtoResponseDto>;
-        }));
-    }
-
-    protected processGetById(response: HttpResponseBase): Observable<UserDtoResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<UserDtoResponseDto>(null as any);
+        return _observableOf<WalletDtoResponseDto>(null as any);
     }
 
     /**
      * @param body (optional) 
      * @return Success
      */
-    update(body: UserDto | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/Update";
+    update(body: WalletDto | undefined): Observable<WalletDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/Update";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -621,14 +455,14 @@ export class UserServiceProxy {
                 try {
                     return this.processUpdate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<WalletDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<UserDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<WalletDtoResponseDto>;
         }));
     }
 
-    protected processUpdate(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processUpdate(response: HttpResponseBase): Observable<WalletDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -639,7 +473,7 @@ export class UserServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoResponseDto.fromJS(resultData200);
+            result200 = WalletDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -647,14 +481,119 @@ export class UserServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<UserDtoResponseDto>(null as any);
+        return _observableOf<WalletDtoResponseDto>(null as any);
     }
 
     /**
      * @return Success
      */
-    delete(id: number): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/Delete/{id}";
+    get(): Observable<WalletDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/Get";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletDtoIEnumerableResponseDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<WalletDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletDtoIEnumerableResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getById(id: number): Observable<WalletDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/GetById/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletDtoResponseDto>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<WalletDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    delete(id: number): Observable<WalletDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -675,14 +614,14 @@ export class UserServiceProxy {
                 try {
                     return this.processDelete(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<WalletDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<UserDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<WalletDtoResponseDto>;
         }));
     }
 
-    protected processDelete(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processDelete(response: HttpResponseBase): Observable<WalletDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -693,7 +632,7 @@ export class UserServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoResponseDto.fromJS(resultData200);
+            result200 = WalletDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -701,7 +640,7 @@ export class UserServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<UserDtoResponseDto>(null as any);
+        return _observableOf<WalletDtoResponseDto>(null as any);
     }
 
     /**
@@ -709,8 +648,8 @@ export class UserServiceProxy {
      * @param pageSize (optional) 
      * @return Success
      */
-    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<UserDtoPagedListResponseDto> {
-        let url_ = this.baseUrl + "/api/User/GetAll?";
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<WalletDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/Wallet/GetAll?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -736,14 +675,14 @@ export class UserServiceProxy {
                 try {
                     return this.processGetAll(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserDtoPagedListResponseDto>;
+                    return _observableThrow(e) as any as Observable<WalletDtoPagedListResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<UserDtoPagedListResponseDto>;
+                return _observableThrow(response_) as any as Observable<WalletDtoPagedListResponseDto>;
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<UserDtoPagedListResponseDto> {
+    protected processGetAll(response: HttpResponseBase): Observable<WalletDtoPagedListResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -754,7 +693,7 @@ export class UserServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserDtoPagedListResponseDto.fromJS(resultData200);
+            result200 = WalletDtoPagedListResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -762,536 +701,572 @@ export class UserServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<UserDtoPagedListResponseDto>(null as any);
+        return _observableOf<WalletDtoPagedListResponseDto>(null as any);
     }
 }
 
-export class CreateRolesDto implements ICreateRolesDto {
-    name: string | undefined;
+@Injectable()
+export class WalletGroupsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(data?: ICreateRolesDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    add(body: CreateWalletGroupDto | undefined): Observable<WalletGroupDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/Add";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdd(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdd(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoResponseDto>;
+        }));
+    }
+
+    protected processAdd(response: HttpResponseBase): Observable<WalletGroupDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
+        return _observableOf<WalletGroupDtoResponseDto>(null as any);
     }
 
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    getByUserId(userId: number | undefined): Observable<WalletGroupDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/GetByUserId?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByUserId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByUserId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoIEnumerableResponseDto>;
+        }));
+    }
+
+    protected processGetByUserId(response: HttpResponseBase): Observable<WalletGroupDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
+        return _observableOf<WalletGroupDtoIEnumerableResponseDto>(null as any);
     }
 
-    static fromJS(data: any): CreateRolesDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateRolesDto();
-        result.init(data);
-        return result;
+    /**
+     * @return Success
+     */
+    get(): Observable<WalletGroupDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/Get";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoIEnumerableResponseDto>;
+        }));
     }
 
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        return data;
+    protected processGet(response: HttpResponseBase): Observable<WalletGroupDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletGroupDtoIEnumerableResponseDto>(null as any);
     }
 
-    clone(): CreateRolesDto {
-        const json = this.toJSON();
-        let result = new CreateRolesDto();
-        result.init(json);
-        return result;
+    /**
+     * @return Success
+     */
+    getById(id: number): Observable<WalletGroupDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/GetById/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoResponseDto>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<WalletGroupDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletGroupDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: WalletGroupDto | undefined): Observable<WalletGroupDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoResponseDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<WalletGroupDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletGroupDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    delete(id: number): Observable<WalletGroupDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/Delete/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoResponseDto>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<WalletGroupDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletGroupDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return Success
+     */
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<WalletGroupDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletGroups/GetAll?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<WalletGroupDtoPagedListResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<WalletGroupDtoPagedListResponseDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<WalletGroupDtoPagedListResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = WalletGroupDtoPagedListResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WalletGroupDtoPagedListResponseDto>(null as any);
     }
 }
 
-export interface ICreateRolesDto {
-    name: string | undefined;
-}
-
-export class CreateUserDto implements ICreateUserDto {
-    firstName: string;
-    lastName: string;
-    userName: string;
-    emailAddress: string;
-    passWord: string;
-
-    constructor(data?: ICreateUserDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.userName = _data["userName"];
-            this.emailAddress = _data["emailAddress"];
-            this.passWord = _data["passWord"];
-        }
-    }
-
-    static fromJS(data: any): CreateUserDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateUserDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["userName"] = this.userName;
-        data["emailAddress"] = this.emailAddress;
-        data["passWord"] = this.passWord;
-        return data;
-    }
-
-    clone(): CreateUserDto {
-        const json = this.toJSON();
-        let result = new CreateUserDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateUserDto {
-    firstName: string;
-    lastName: string;
-    userName: string;
-    emailAddress: string;
-    passWord: string;
-}
-
-export class LoginResultDto implements ILoginResultDto {
-    result: LoginResultType;
-    user: UserDto;
-
-    constructor(data?: ILoginResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.result = _data["result"];
-            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): LoginResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["result"] = this.result;
-        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): LoginResultDto {
-        const json = this.toJSON();
-        let result = new LoginResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ILoginResultDto {
-    result: LoginResultType;
-    user: UserDto;
-}
-
-export class LoginResultDtoResponseDto implements ILoginResultDtoResponseDto {
-    isSuccess: boolean;
-    result: LoginResultDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: ILoginResultDtoResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"] ? LoginResultDto.fromJS(_data["result"]) : <any>undefined;
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): LoginResultDtoResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginResultDtoResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): LoginResultDtoResponseDto {
-        const json = this.toJSON();
-        let result = new LoginResultDtoResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ILoginResultDtoResponseDto {
-    isSuccess: boolean;
-    result: LoginResultDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export enum LoginResultType {
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
-    _4 = 4,
-    _5 = 5,
-}
-
-export class RolesDto implements IRolesDto {
-    id: number;
-    name: string | undefined;
-
-    constructor(data?: IRolesDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): RolesDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new RolesDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        return data;
-    }
-
-    clone(): RolesDto {
-        const json = this.toJSON();
-        let result = new RolesDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRolesDto {
-    id: number;
-    name: string | undefined;
-}
-
-export class RolesDtoIEnumerableResponseDto implements IRolesDtoIEnumerableResponseDto {
-    isSuccess: boolean;
-    result: RolesDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: IRolesDtoIEnumerableResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            if (Array.isArray(_data["result"])) {
-                this.result = [] as any;
-                for (let item of _data["result"])
-                    this.result.push(RolesDto.fromJS(item));
-            }
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): RolesDtoIEnumerableResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new RolesDtoIEnumerableResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        if (Array.isArray(this.result)) {
-            data["result"] = [];
-            for (let item of this.result)
-                data["result"].push(item.toJSON());
-        }
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): RolesDtoIEnumerableResponseDto {
-        const json = this.toJSON();
-        let result = new RolesDtoIEnumerableResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRolesDtoIEnumerableResponseDto {
-    isSuccess: boolean;
-    result: RolesDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export class RolesDtoPagedListResponseDto implements IRolesDtoPagedListResponseDto {
-    isSuccess: boolean;
-    result: RolesDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: IRolesDtoPagedListResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            if (Array.isArray(_data["result"])) {
-                this.result = [] as any;
-                for (let item of _data["result"])
-                    this.result.push(RolesDto.fromJS(item));
-            }
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): RolesDtoPagedListResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new RolesDtoPagedListResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        if (Array.isArray(this.result)) {
-            data["result"] = [];
-            for (let item of this.result)
-                data["result"].push(item.toJSON());
-        }
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): RolesDtoPagedListResponseDto {
-        const json = this.toJSON();
-        let result = new RolesDtoPagedListResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRolesDtoPagedListResponseDto {
-    isSuccess: boolean;
-    result: RolesDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export class RolesDtoResponseDto implements IRolesDtoResponseDto {
-    isSuccess: boolean;
-    result: RolesDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: IRolesDtoResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"] ? RolesDto.fromJS(_data["result"]) : <any>undefined;
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): RolesDtoResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new RolesDtoResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): RolesDtoResponseDto {
-        const json = this.toJSON();
-        let result = new RolesDtoResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRolesDtoResponseDto {
-    isSuccess: boolean;
-    result: RolesDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export class UserDto implements IUserDto {
-    id: number;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    emailAddress: string;
-    passWord: string;
-    passwordSalt: string | undefined;
-    kycApprovedDate: DateTime | undefined;
-    isKYCApproved: boolean;
-    isTwoFactorEnabled: boolean;
+export class CreateNetworksDto implements ICreateNetworksDto {
+    name: string;
     isActive: boolean;
-    isLockedOut: boolean;
-    readonly displayName: string | undefined;
-    roles: RolesDto[];
+    isDefault: boolean;
 
-    constructor(data?: IUserDto) {
+    constructor(data?: ICreateNetworksDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.roles = [];
-        }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.userName = _data["userName"];
-            this.emailAddress = _data["emailAddress"];
-            this.passWord = _data["passWord"];
-            this.passwordSalt = _data["passwordSalt"];
-            this.kycApprovedDate = _data["kycApprovedDate"] ? DateTime.fromISO(_data["kycApprovedDate"].toString()) : <any>undefined;
-            this.isKYCApproved = _data["isKYCApproved"];
-            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
+            this.name = _data["name"];
             this.isActive = _data["isActive"];
-            this.isLockedOut = _data["isLockedOut"];
-            (<any>this).displayName = _data["displayName"];
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles.push(RolesDto.fromJS(item));
+            this.isDefault = _data["isDefault"];
+        }
+    }
+
+    static fromJS(data: any): CreateNetworksDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateNetworksDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["isActive"] = this.isActive;
+        data["isDefault"] = this.isDefault;
+        return data;
+    }
+
+    clone(): CreateNetworksDto {
+        const json = this.toJSON();
+        let result = new CreateNetworksDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateNetworksDto {
+    name: string;
+    isActive: boolean;
+    isDefault: boolean;
+}
+
+export class CreateWalletDto implements ICreateWalletDto {
+    walletGroupsId: number;
+    network: string;
+
+    constructor(data?: ICreateWalletDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
             }
         }
     }
 
-    static fromJS(data: any): UserDto {
+    init(_data?: any) {
+        if (_data) {
+            this.walletGroupsId = _data["walletGroupsId"];
+            this.network = _data["network"];
+        }
+    }
+
+    static fromJS(data: any): CreateWalletDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserDto();
+        let result = new CreateWalletDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["walletGroupsId"] = this.walletGroupsId;
+        data["network"] = this.network;
+        return data;
+    }
+
+    clone(): CreateWalletDto {
+        const json = this.toJSON();
+        let result = new CreateWalletDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateWalletDto {
+    walletGroupsId: number;
+    network: string;
+}
+
+export class CreateWalletGroupDto implements ICreateWalletGroupDto {
+
+    constructor(data?: ICreateWalletGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): CreateWalletGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateWalletGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
+
+    clone(): CreateWalletGroupDto {
+        const json = this.toJSON();
+        let result = new CreateWalletGroupDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateWalletGroupDto {
+}
+
+export class NetworkDto implements INetworkDto {
+    id: number;
+    name: string;
+    isActive: boolean;
+    isDefault: boolean;
+
+    constructor(data?: INetworkDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.isActive = _data["isActive"];
+            this.isDefault = _data["isDefault"];
+        }
+    }
+
+    static fromJS(data: any): NetworkDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NetworkDto();
         result.init(data);
         return result;
     }
@@ -1299,58 +1274,34 @@ export class UserDto implements IUserDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["userName"] = this.userName;
-        data["emailAddress"] = this.emailAddress;
-        data["passWord"] = this.passWord;
-        data["passwordSalt"] = this.passwordSalt;
-        data["kycApprovedDate"] = this.kycApprovedDate ? this.kycApprovedDate.toString() : <any>undefined;
-        data["isKYCApproved"] = this.isKYCApproved;
-        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
+        data["name"] = this.name;
         data["isActive"] = this.isActive;
-        data["isLockedOut"] = this.isLockedOut;
-        data["displayName"] = this.displayName;
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item.toJSON());
-        }
+        data["isDefault"] = this.isDefault;
         return data;
     }
 
-    clone(): UserDto {
+    clone(): NetworkDto {
         const json = this.toJSON();
-        let result = new UserDto();
+        let result = new NetworkDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUserDto {
+export interface INetworkDto {
     id: number;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    emailAddress: string;
-    passWord: string;
-    passwordSalt: string | undefined;
-    kycApprovedDate: DateTime | undefined;
-    isKYCApproved: boolean;
-    isTwoFactorEnabled: boolean;
+    name: string;
     isActive: boolean;
-    isLockedOut: boolean;
-    displayName: string | undefined;
-    roles: RolesDto[];
+    isDefault: boolean;
 }
 
-export class UserDtoIEnumerableResponseDto implements IUserDtoIEnumerableResponseDto {
+export class NetworkDtoIEnumerableResponseDto implements INetworkDtoIEnumerableResponseDto {
     isSuccess: boolean;
-    result: UserDto[] | undefined;
+    result: NetworkDto[] | undefined;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 
-    constructor(data?: IUserDtoIEnumerableResponseDto) {
+    constructor(data?: INetworkDtoIEnumerableResponseDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1365,7 +1316,7 @@ export class UserDtoIEnumerableResponseDto implements IUserDtoIEnumerableRespons
             if (Array.isArray(_data["result"])) {
                 this.result = [] as any;
                 for (let item of _data["result"])
-                    this.result.push(UserDto.fromJS(item));
+                    this.result.push(NetworkDto.fromJS(item));
             }
             this.displayMessage = _data["displayMessage"];
             if (Array.isArray(_data["errorMessages"])) {
@@ -1376,9 +1327,9 @@ export class UserDtoIEnumerableResponseDto implements IUserDtoIEnumerableRespons
         }
     }
 
-    static fromJS(data: any): UserDtoIEnumerableResponseDto {
+    static fromJS(data: any): NetworkDtoIEnumerableResponseDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserDtoIEnumerableResponseDto();
+        let result = new NetworkDtoIEnumerableResponseDto();
         result.init(data);
         return result;
     }
@@ -1400,28 +1351,28 @@ export class UserDtoIEnumerableResponseDto implements IUserDtoIEnumerableRespons
         return data;
     }
 
-    clone(): UserDtoIEnumerableResponseDto {
+    clone(): NetworkDtoIEnumerableResponseDto {
         const json = this.toJSON();
-        let result = new UserDtoIEnumerableResponseDto();
+        let result = new NetworkDtoIEnumerableResponseDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUserDtoIEnumerableResponseDto {
+export interface INetworkDtoIEnumerableResponseDto {
     isSuccess: boolean;
-    result: UserDto[] | undefined;
+    result: NetworkDto[] | undefined;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 }
 
-export class UserDtoPagedListResponseDto implements IUserDtoPagedListResponseDto {
+export class NetworkDtoPagedListResponseDto implements INetworkDtoPagedListResponseDto {
     isSuccess: boolean;
-    result: UserDto[] | undefined;
+    result: NetworkDto[] | undefined;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 
-    constructor(data?: IUserDtoPagedListResponseDto) {
+    constructor(data?: INetworkDtoPagedListResponseDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1436,7 +1387,7 @@ export class UserDtoPagedListResponseDto implements IUserDtoPagedListResponseDto
             if (Array.isArray(_data["result"])) {
                 this.result = [] as any;
                 for (let item of _data["result"])
-                    this.result.push(UserDto.fromJS(item));
+                    this.result.push(NetworkDto.fromJS(item));
             }
             this.displayMessage = _data["displayMessage"];
             if (Array.isArray(_data["errorMessages"])) {
@@ -1447,9 +1398,9 @@ export class UserDtoPagedListResponseDto implements IUserDtoPagedListResponseDto
         }
     }
 
-    static fromJS(data: any): UserDtoPagedListResponseDto {
+    static fromJS(data: any): NetworkDtoPagedListResponseDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserDtoPagedListResponseDto();
+        let result = new NetworkDtoPagedListResponseDto();
         result.init(data);
         return result;
     }
@@ -1471,28 +1422,28 @@ export class UserDtoPagedListResponseDto implements IUserDtoPagedListResponseDto
         return data;
     }
 
-    clone(): UserDtoPagedListResponseDto {
+    clone(): NetworkDtoPagedListResponseDto {
         const json = this.toJSON();
-        let result = new UserDtoPagedListResponseDto();
+        let result = new NetworkDtoPagedListResponseDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUserDtoPagedListResponseDto {
+export interface INetworkDtoPagedListResponseDto {
     isSuccess: boolean;
-    result: UserDto[] | undefined;
+    result: NetworkDto[] | undefined;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 }
 
-export class UserDtoResponseDto implements IUserDtoResponseDto {
+export class NetworkDtoResponseDto implements INetworkDtoResponseDto {
     isSuccess: boolean;
-    result: UserDto;
+    result: NetworkDto;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 
-    constructor(data?: IUserDtoResponseDto) {
+    constructor(data?: INetworkDtoResponseDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1504,7 +1455,7 @@ export class UserDtoResponseDto implements IUserDtoResponseDto {
     init(_data?: any) {
         if (_data) {
             this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"] ? UserDto.fromJS(_data["result"]) : <any>undefined;
+            this.result = _data["result"] ? NetworkDto.fromJS(_data["result"]) : <any>undefined;
             this.displayMessage = _data["displayMessage"];
             if (Array.isArray(_data["errorMessages"])) {
                 this.errorMessages = [] as any;
@@ -1514,9 +1465,9 @@ export class UserDtoResponseDto implements IUserDtoResponseDto {
         }
     }
 
-    static fromJS(data: any): UserDtoResponseDto {
+    static fromJS(data: any): NetworkDtoResponseDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserDtoResponseDto();
+        let result = new NetworkDtoResponseDto();
         result.init(data);
         return result;
     }
@@ -1534,17 +1485,553 @@ export class UserDtoResponseDto implements IUserDtoResponseDto {
         return data;
     }
 
-    clone(): UserDtoResponseDto {
+    clone(): NetworkDtoResponseDto {
         const json = this.toJSON();
-        let result = new UserDtoResponseDto();
+        let result = new NetworkDtoResponseDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUserDtoResponseDto {
+export interface INetworkDtoResponseDto {
     isSuccess: boolean;
-    result: UserDto;
+    result: NetworkDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletDto implements IWalletDto {
+    id: number;
+    walletGroupsId: number;
+    network: string | undefined;
+    balance: number;
+    isActive: boolean;
+
+    constructor(data?: IWalletDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.walletGroupsId = _data["walletGroupsId"];
+            this.network = _data["network"];
+            this.balance = _data["balance"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): WalletDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["walletGroupsId"] = this.walletGroupsId;
+        data["network"] = this.network;
+        data["balance"] = this.balance;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+
+    clone(): WalletDto {
+        const json = this.toJSON();
+        let result = new WalletDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletDto {
+    id: number;
+    walletGroupsId: number;
+    network: string | undefined;
+    balance: number;
+    isActive: boolean;
+}
+
+export class WalletDtoIEnumerableResponseDto implements IWalletDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: WalletDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletDtoIEnumerableResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(WalletDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletDtoIEnumerableResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletDtoIEnumerableResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletDtoIEnumerableResponseDto {
+        const json = this.toJSON();
+        let result = new WalletDtoIEnumerableResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: WalletDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletDtoPagedListResponseDto implements IWalletDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: WalletDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletDtoPagedListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(WalletDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletDtoPagedListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletDtoPagedListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletDtoPagedListResponseDto {
+        const json = this.toJSON();
+        let result = new WalletDtoPagedListResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: WalletDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletDtoResponseDto implements IWalletDtoResponseDto {
+    isSuccess: boolean;
+    result: WalletDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletDtoResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"] ? WalletDto.fromJS(_data["result"]) : <any>undefined;
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletDtoResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletDtoResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletDtoResponseDto {
+        const json = this.toJSON();
+        let result = new WalletDtoResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletDtoResponseDto {
+    isSuccess: boolean;
+    result: WalletDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletGroupDto implements IWalletGroupDto {
+    id: number;
+    userId: number;
+    wallets: WalletDto[] | undefined;
+    isActive: boolean;
+    isMain: boolean;
+
+    constructor(data?: IWalletGroupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.userId = _data["userId"];
+            if (Array.isArray(_data["wallets"])) {
+                this.wallets = [] as any;
+                for (let item of _data["wallets"])
+                    this.wallets.push(WalletDto.fromJS(item));
+            }
+            this.isActive = _data["isActive"];
+            this.isMain = _data["isMain"];
+        }
+    }
+
+    static fromJS(data: any): WalletGroupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletGroupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["userId"] = this.userId;
+        if (Array.isArray(this.wallets)) {
+            data["wallets"] = [];
+            for (let item of this.wallets)
+                data["wallets"].push(item.toJSON());
+        }
+        data["isActive"] = this.isActive;
+        data["isMain"] = this.isMain;
+        return data;
+    }
+
+    clone(): WalletGroupDto {
+        const json = this.toJSON();
+        let result = new WalletGroupDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletGroupDto {
+    id: number;
+    userId: number;
+    wallets: WalletDto[] | undefined;
+    isActive: boolean;
+    isMain: boolean;
+}
+
+export class WalletGroupDtoIEnumerableResponseDto implements IWalletGroupDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletGroupDtoIEnumerableResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(WalletGroupDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletGroupDtoIEnumerableResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletGroupDtoIEnumerableResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletGroupDtoIEnumerableResponseDto {
+        const json = this.toJSON();
+        let result = new WalletGroupDtoIEnumerableResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletGroupDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletGroupDtoPagedListResponseDto implements IWalletGroupDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletGroupDtoPagedListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(WalletGroupDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletGroupDtoPagedListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletGroupDtoPagedListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletGroupDtoPagedListResponseDto {
+        const json = this.toJSON();
+        let result = new WalletGroupDtoPagedListResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletGroupDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class WalletGroupDtoResponseDto implements IWalletGroupDtoResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IWalletGroupDtoResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"] ? WalletGroupDto.fromJS(_data["result"]) : <any>undefined;
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): WalletGroupDtoResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WalletGroupDtoResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): WalletGroupDtoResponseDto {
+        const json = this.toJSON();
+        let result = new WalletGroupDtoResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IWalletGroupDtoResponseDto {
+    isSuccess: boolean;
+    result: WalletGroupDto;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
 }

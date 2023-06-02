@@ -1,0 +1,78 @@
+<div *ngIf="!isPageLoading">
+  <table class="table table-bordered table-striped"
+    *ngIf="walletGroups && walletGroups.length > 0;  else noWalletGroups">
+    <thead>
+      <tr class="text-center">
+        <th>ID</th>
+        <th>User ID</th>
+        <th>Active</th>
+        <th>Wallets</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let walletGroup of walletGroups">
+        <td>{{ walletGroup.id }}</td>
+        <td>{{ walletGroup.userId }}</td>
+        <td>{{ walletGroup.isActive }}</td>
+        <td>
+          <div class="dropdown" *ngIf="walletGroup.wallets && walletGroup.wallets.length > 0; else noWallet">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="walletsDropdown"
+              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Wallets ({{ walletGroup.wallets.length }})
+            </button>
+            <div class="dropdown-menu" aria-labelledby="walletsDropdown">
+              <ng-container *ngFor="let wallet of walletGroup.wallets">
+                <a class="dropdown-item">
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">ID:{{ wallet.id }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Network:{{ wallet.network }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Balance:{{ wallet.balance }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Active:{{ wallet.isActive }}</span>
+                  </div>
+                </a>
+              </ng-container>
+            </div>
+          </div>
+          <ng-template #noWallet>
+            No wallet found.
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noWalletGroups>
+    <p>No wallet groups found.</p>
+  </ng-template>
+  <h2>Add Wallet Group</h2>
+  <form (ngSubmit)="addWalletGroup()">
+    <!-- <label>
+      User ID:
+      <input type="number" name="userId" [(ngModel)]="userId" required max="2147483647">
+    </label> -->
+    <br>
+    <button type="submit">Add Wallet Group</button>
+  </form>
+
+  <h2>Add Wallet to Wallet Group</h2>
+  <form (ngSubmit)="addWallet()">
+    <label>
+      Wallet Group Id:
+      <select name="selectedWalletGroupsId" [(ngModel)]="selectedWalletGroupsId" required>
+        <option *ngFor="let walletGroup of walletGroups" [value]="walletGroup.id">{{ walletGroup.id }}</option>
+      </select>
+    </label>
+    <br>
+    <label>
+      Network:
+      <input type="text" name="network" [(ngModel)]="network" required>
+    </label>
+    <br>
+    <button type="submit">Add Wallet</button>
+  </form>
+</div>

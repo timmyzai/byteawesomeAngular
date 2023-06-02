@@ -5,6 +5,9 @@
   <div>
     <a routerLink="/login" *ngIf="!isLoggedIn">Login</a>
   </div>
+  <div>
+    <a routerLink="/wallet-group" *ngIf="isLoggedIn">Wallets Groups</a>
+  </div>
 </nav>
 <div class="container m-3">
   <router-outlet></router-outlet>

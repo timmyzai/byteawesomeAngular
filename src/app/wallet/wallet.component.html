@@ -1,0 +1,20 @@
+<thead *ngIf="wallets && wallets.length > 0; else noWallet">
+  <tr>
+    <th>ID</th>
+    <th>Network</th>
+    <th>Balance</th>
+    <th>Active</th>
+  </tr>
+</thead>
+<thead>
+  <tr *ngFor="let wallet of wallets">
+    <th>{{ wallet.id }}</th>
+    <th>{{ wallet.network }}</th>
+    <th>{{ wallet.balance }}</th>
+    <th>{{ wallet.isActive }}</th>
+  </tr>
+</thead>
+
+<ng-template #noWallet>
+  No wallet found.
+</ng-template>

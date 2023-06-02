@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 
 import * as AuthApiServiceProxies from './auth-service-proxies';
 import * as UserApiServiceProxies from './user-service-proxies';
+import * as WalletApiServiceProxies from './wallet-service-proxies';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './TokenInterceptor';
 
@@ -9,8 +10,11 @@ import { TokenInterceptor } from './TokenInterceptor';
     providers: [
         AuthApiServiceProxies.AuthenticationServiceProxy,
         AuthApiServiceProxies.TwoFactorAuthServiceProxy,
-        UserApiServiceProxies.RolesServiceProxy,
+        UserApiServiceProxies.RoleServiceProxy,
         UserApiServiceProxies.UserServiceProxy,
+        WalletApiServiceProxies.NetworkServiceProxy,
+        WalletApiServiceProxies.WalletGroupsServiceProxy,
+        WalletApiServiceProxies.WalletServiceProxy,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: TokenInterceptor,

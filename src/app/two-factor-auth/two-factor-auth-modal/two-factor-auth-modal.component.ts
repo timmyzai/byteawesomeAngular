@@ -41,12 +41,12 @@ export class TwoFactorAuthModalComponent {
   }
 
   submit() {
-    const userId = 1;
+      const userId = parseInt(localStorage.getItem('loggedInUserId'));
     const twoFactorPin = this.otpBoxes.join('');
     this._twoFactorAuthService.validateTwoFactorPIN(userId, twoFactorPin).subscribe(
-      (bool) => {
-        if (bool) {
-          this.validateTwoFactorResult.emit(bool);
+      (boolResponseDto) => {
+        if (boolResponseDto.result) {
+          this.validateTwoFactorResult.emit(boolResponseDto.result);
           this.hideModal();
         } else {
           this.isInvalidPin = true;

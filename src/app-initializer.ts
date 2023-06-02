@@ -15,6 +15,7 @@ export class AppInitializer {
         AppConsts.appBaseUrl = response.appBaseUrl;
         AppConsts.remoteAuthServiceBaseUrl = response.remoteAuthServiceBaseUrl;
         AppConsts.remoteUserServiceBaseUrl = response.remoteUserServiceBaseUrl;
+        AppConsts.remoteWalletServiceBaseUrl = response.remoteWalletServiceBaseUrl;
       })
     );
   }

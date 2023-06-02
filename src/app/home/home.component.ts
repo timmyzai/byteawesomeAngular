@@ -5,7 +5,7 @@ import { AppAuthService } from 'src/shared/auth/app-auth.service';
 
 import { TwoFactorAuthModalComponent } from '../two-factor-auth/two-factor-auth-modal/two-factor-auth-modal.component';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { UserDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
+import { UserDto, UserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
 
 @Component({
   selector: 'app-home',
@@ -28,10 +28,10 @@ export class HomeComponent {
     this.authService.logout();
   }
   secret(): void {
-    const userId = 1;
+    const userId = parseInt(localStorage.getItem('loggedInUserId'));
     this._userService.getById(userId).subscribe(
-      (result: UserDto) => {
-        this.isToggleTrue = result.isTwoFactorEnabled;
+      (userResponseDto: UserDtoResponseDto) => {
+        this.isToggleTrue = userResponseDto.result.isTwoFactorEnabled;
 
         if (this.isToggleTrue) {
           this.showTwoFactorAuthModal();

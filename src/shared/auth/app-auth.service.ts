@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from 'src/shared/AppConsts';
-import { AuthenticateModel, AuthenticateResultModel, AuthenticationServiceProxy, } from 'src/shared/service-proxies/auth-service-proxies';
+import { AuthenticateModel, AuthenticateResultModel, AuthenticateResultModelResponseDto, AuthenticationServiceProxy, } from 'src/shared/service-proxies/auth-service-proxies';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { CookiesService } from '../services/cookies.service';
 
 @Injectable()
 export class AppAuthService {
   authenticateModel: AuthenticateModel;
-  authenticateResult: AuthenticateResultModel;
+  authenticateResult: AuthenticateResultModelResponseDto;
   rememberMe: boolean;
 
   constructor(
@@ -24,26 +24,30 @@ export class AppAuthService {
   logout(reload?: boolean): void {
     this._cookieService.deleteCookie(AppConsts.authorization.encryptedAuthTokenName);
     this._cookieService.deleteCookie("accessToken");
+    localStorage.clear();
 
     if (reload !== false) {
       location.href = AppConsts.appBaseUrl;
     }
   }
 
-  authenticate(finallyCallback: () => void): void {
+  authenticate(callback: (result: AuthenticateResultModelResponseDto) => void) {
     this._tokenAuthService.authenticate(this.authenticateModel)
       .pipe(
-        finalize(finallyCallback)
-      )
-      .subscribe((result: AuthenticateResultModel) => {
-        this.processAuthenticateResult(result);
+        finalize(() => {
+          callback(this.authenticateResult);
+        })
+      ).subscribe((result: AuthenticateResultModelResponseDto) => {
+        this.authenticateResult = result;
+        if (result.isSuccess) {
+          this.processAuthenticateResult(result.result);
+        }
       });
   }
 
   private processAuthenticateResult(authenticateResult: AuthenticateResultModel): void {
     const require2fa = authenticateResult.require2fa;
     const twoFactorPin = this.authenticateModel.twoFactorPin;
-
     if (require2fa && twoFactorPin == null) {
       this._router.navigate(['two-factor-auth-page']);
       return;
@@ -52,9 +56,10 @@ export class AppAuthService {
     const accessToken = authenticateResult.accessToken;
     const encryptedAccessToken = authenticateResult.encryptedAccessToken;
     const expireInSeconds = authenticateResult.expireInSeconds;
+    const userId = authenticateResult.userId;
 
     if (accessToken) {
-      this.login(accessToken, encryptedAccessToken, expireInSeconds, this.rememberMe);
+      this.login(accessToken, encryptedAccessToken, expireInSeconds, userId, this.rememberMe);
     } else {
       console.error('Unexpected authenticateResult!');
       this._router.navigate(['login']);
@@ -65,12 +70,14 @@ export class AppAuthService {
     accessToken: string,
     encryptedAccessToken: string,
     expireInSeconds: number,
+    userId: number,
     rememberMe?: boolean
   ): void {
     const tokenExpireDate = new Date(new Date().getTime() + 1000 * expireInSeconds);
 
     this._cookieService.setCookieValue("accessToken", accessToken, tokenExpireDate);
     this._cookieService.setCookieValue(AppConsts.authorization.encryptedAuthTokenName, encryptedAccessToken, tokenExpireDate);
+    localStorage.setItem('loggedInUserId', userId.toString());
 
     if (rememberMe) {
       var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userNameOrEmailAddress);
