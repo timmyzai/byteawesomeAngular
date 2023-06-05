@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CreateWalletDto, CreateWalletGroupDto, WalletDtoResponseDto, WalletGroupDto, WalletGroupDtoIEnumerableResponseDto, WalletGroupDtoResponseDto, WalletGroupsServiceProxy, WalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
+import { Router } from '@angular/router';
+import { CreateWalletDto, CreateWalletGroupDto, CoinDto, CoinDtoIEnumerableResponseDto, CoinServiceProxy, WalletDtoResponseDto, WalletGroupDto, WalletGroupDtoIEnumerableResponseDto, WalletGroupDtoResponseDto, WalletGroupsServiceProxy, WalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
 import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
-import { NotifyServices } from 'src/shared/services/notify.services';
 
 @Component({
   selector: 'app-wallet-group',
@@ -10,22 +10,39 @@ import { NotifyServices } from 'src/shared/services/notify.services';
 })
 export class WalletGroupComponent implements OnInit {
   walletGroups: WalletGroupDto[];
+  coinList: CoinDto[];
   isPageLoading = true;
   errorMsg: string = undefined;
   userId: number = undefined;
-  network: string;
   selectedWalletGroupsId: number;
+  selectedCoinId: number;
 
   constructor(
     private walletGroupServices: WalletGroupsServiceProxy,
     private walletServices: WalletServiceProxy,
-    private notify: NotifyServices,
+    private coinServices: CoinServiceProxy,
     private errorHandler: ApiErrorHandlerService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.getWalletGroup();
+    this.getCoinList();
   }
+  private async getCoinList() {
+    try {
+      this.isPageLoading = true;
+      const netowrkListResponseDto: CoinDtoIEnumerableResponseDto = await this.coinServices.get().toPromise();
+      this.errorHandler.handleErrorResponse(netowrkListResponseDto, 'Wallet group GetByUserId Failed');
+      this.coinList = netowrkListResponseDto.result;
+      if (this.coinList.length > 0) {
+        this.selectedCoinId = this.coinList[0].id;
+      }
+    } finally {
+      this.isPageLoading = false;
+    }
+  }
+
   private async getWalletGroup() {
     try {
       this.isPageLoading = true;
@@ -54,19 +71,36 @@ export class WalletGroupComponent implements OnInit {
 
   async addWallet() {
     try {
-      if (this.network == undefined) {
-        this.errorMsg = "network is required."
-        this.notify.showError(`${this.errorMsg}`, 'Add wallet Error', 5);
-        return;
-      }
       var param = new CreateWalletDto();
       param.walletGroupsId = this.selectedWalletGroupsId;
-      param.network = this.network;
+      param.coin = this.coinList.find(x => x.id == this.selectedCoinId);
       const walletResponseDto: WalletDtoResponseDto = await this.walletServices.add(param).toPromise();
-      this.errorHandler.handleErrorResponse(walletResponseDto, 'Wallet group add Failed');
-
+      this.errorHandler.handleErrorResponse(walletResponseDto, 'Wallet add Failed');
     } finally {
       this.getWalletGroup();
     }
+  }
+
+  async confirmUpdate(walletGroupId: number) {
+    const confirmed = confirm('Please confirm to update this wallet group?');
+    if (confirmed) {
+      await this.updateWalletGroup(walletGroupId);
+    }
+  }
+
+  async updateWalletGroup(walletGroupId: number) {
+    try {
+      var param = this.walletGroups.find(x => x.id == walletGroupId);
+      param.isActive = !param.isActive;
+      const walletGroupResponseDto: WalletGroupDtoResponseDto = await this.walletGroupServices.update(param).toPromise();
+      this.errorHandler.handleErrorResponse(walletGroupResponseDto, 'Wallet group update Failed');
+    } finally {
+      this.getWalletGroup();
+      this.userId = undefined;
+    }
+  }
+
+  navigateToWallet(walletId: number) {
+    this.router.navigate([`wallet/${walletId}`]);
   }
 }

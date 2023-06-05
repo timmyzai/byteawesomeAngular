@@ -12,7 +12,7 @@ import { TokenInterceptor } from './TokenInterceptor';
         AuthApiServiceProxies.TwoFactorAuthServiceProxy,
         UserApiServiceProxies.RoleServiceProxy,
         UserApiServiceProxies.UserServiceProxy,
-        WalletApiServiceProxies.NetworkServiceProxy,
+        WalletApiServiceProxies.CoinServiceProxy,
         WalletApiServiceProxies.WalletGroupsServiceProxy,
         WalletApiServiceProxies.WalletServiceProxy,
         {

@@ -15,9 +15,9 @@ const routes: Routes = [
   { path: 'two-factor-auth-page', component: TwoFactorAuthPageComponent },
   { path: 'secret-place', component: SecretPlaceComponent },
   { path: 'wallet-group', component: WalletGroupComponent },
-  { path: 'wallet', component: WalletComponent },
+  { path: 'wallet/:id', component: WalletComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login', pathMatch: 'full' }
+  { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ];
 
 @NgModule({

@@ -18,7 +18,7 @@ import { DateTime, Duration } from "luxon";
 export const WALLET_API_BASE_URL = new InjectionToken<string>('WALLET_API_BASE_URL');
 
 @Injectable()
-export class NetworkServiceProxy {
+export class CoinServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -31,8 +31,59 @@ export class NetworkServiceProxy {
     /**
      * @return Success
      */
-    get(): Observable<NetworkDtoIEnumerableResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/Get";
+    getDefaultCoin(): Observable<CoinDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/GetDefaultCoin";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDefaultCoin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDefaultCoin(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CoinDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CoinDtoResponseDto>;
+        }));
+    }
+
+    protected processGetDefaultCoin(response: HttpResponseBase): Observable<CoinDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CoinDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CoinDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    get(): Observable<CoinDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/Get";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -50,14 +101,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processGet(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoIEnumerableResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoIEnumerableResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoIEnumerableResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoIEnumerableResponseDto>;
         }));
     }
 
-    protected processGet(response: HttpResponseBase): Observable<NetworkDtoIEnumerableResponseDto> {
+    protected processGet(response: HttpResponseBase): Observable<CoinDtoIEnumerableResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -68,7 +119,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoIEnumerableResponseDto.fromJS(resultData200);
+            result200 = CoinDtoIEnumerableResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -76,14 +127,14 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoIEnumerableResponseDto>(null as any);
+        return _observableOf<CoinDtoIEnumerableResponseDto>(null as any);
     }
 
     /**
      * @return Success
      */
-    getById(id: number): Observable<NetworkDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/GetById/{id}";
+    getById(id: number): Observable<CoinDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/GetById/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -104,14 +155,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processGetById(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoResponseDto>;
         }));
     }
 
-    protected processGetById(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
+    protected processGetById(response: HttpResponseBase): Observable<CoinDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -122,7 +173,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoResponseDto.fromJS(resultData200);
+            result200 = CoinDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -130,15 +181,15 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoResponseDto>(null as any);
+        return _observableOf<CoinDtoResponseDto>(null as any);
     }
 
     /**
      * @param body (optional) 
      * @return Success
      */
-    add(body: CreateNetworksDto | undefined): Observable<NetworkDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/Add";
+    add(body: CreateCoinsDto | undefined): Observable<CoinDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/Add";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -160,14 +211,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processAdd(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoResponseDto>;
         }));
     }
 
-    protected processAdd(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
+    protected processAdd(response: HttpResponseBase): Observable<CoinDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -178,7 +229,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoResponseDto.fromJS(resultData200);
+            result200 = CoinDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -186,15 +237,15 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoResponseDto>(null as any);
+        return _observableOf<CoinDtoResponseDto>(null as any);
     }
 
     /**
      * @param body (optional) 
      * @return Success
      */
-    update(body: NetworkDto | undefined): Observable<NetworkDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/Update";
+    update(body: CoinDto | undefined): Observable<CoinDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/Update";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -216,14 +267,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processUpdate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoResponseDto>;
         }));
     }
 
-    protected processUpdate(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
+    protected processUpdate(response: HttpResponseBase): Observable<CoinDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -234,7 +285,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoResponseDto.fromJS(resultData200);
+            result200 = CoinDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -242,14 +293,14 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoResponseDto>(null as any);
+        return _observableOf<CoinDtoResponseDto>(null as any);
     }
 
     /**
      * @return Success
      */
-    delete(id: number): Observable<NetworkDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/Delete/{id}";
+    delete(id: number): Observable<CoinDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -270,14 +321,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processDelete(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoResponseDto>;
         }));
     }
 
-    protected processDelete(response: HttpResponseBase): Observable<NetworkDtoResponseDto> {
+    protected processDelete(response: HttpResponseBase): Observable<CoinDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -288,7 +339,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoResponseDto.fromJS(resultData200);
+            result200 = CoinDtoResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -296,7 +347,7 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoResponseDto>(null as any);
+        return _observableOf<CoinDtoResponseDto>(null as any);
     }
 
     /**
@@ -304,8 +355,8 @@ export class NetworkServiceProxy {
      * @param pageSize (optional) 
      * @return Success
      */
-    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<NetworkDtoPagedListResponseDto> {
-        let url_ = this.baseUrl + "/api/Network/GetAll?";
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<CoinDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/Coin/GetAll?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -331,14 +382,14 @@ export class NetworkServiceProxy {
                 try {
                     return this.processGetAll(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<NetworkDtoPagedListResponseDto>;
+                    return _observableThrow(e) as any as Observable<CoinDtoPagedListResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<NetworkDtoPagedListResponseDto>;
+                return _observableThrow(response_) as any as Observable<CoinDtoPagedListResponseDto>;
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<NetworkDtoPagedListResponseDto> {
+    protected processGetAll(response: HttpResponseBase): Observable<CoinDtoPagedListResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -349,7 +400,7 @@ export class NetworkServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = NetworkDtoPagedListResponseDto.fromJS(resultData200);
+            result200 = CoinDtoPagedListResponseDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -357,7 +408,7 @@ export class NetworkServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<NetworkDtoPagedListResponseDto>(null as any);
+        return _observableOf<CoinDtoPagedListResponseDto>(null as any);
     }
 }
 
@@ -1105,12 +1156,15 @@ export class WalletGroupsServiceProxy {
     }
 }
 
-export class CreateNetworksDto implements ICreateNetworksDto {
-    name: string;
+export class CoinDto implements ICoinDto {
+    id: number;
+    symbol: string;
+    fullName: string;
+    network: string;
     isActive: boolean;
     isDefault: boolean;
 
-    constructor(data?: ICreateNetworksDto) {
+    constructor(data?: ICoinDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1121,44 +1175,317 @@ export class CreateNetworksDto implements ICreateNetworksDto {
 
     init(_data?: any) {
         if (_data) {
-            this.name = _data["name"];
+            this.id = _data["id"];
+            this.symbol = _data["symbol"];
+            this.fullName = _data["fullName"];
+            this.network = _data["network"];
             this.isActive = _data["isActive"];
             this.isDefault = _data["isDefault"];
         }
     }
 
-    static fromJS(data: any): CreateNetworksDto {
+    static fromJS(data: any): CoinDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateNetworksDto();
+        let result = new CoinDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
+        data["id"] = this.id;
+        data["symbol"] = this.symbol;
+        data["fullName"] = this.fullName;
+        data["network"] = this.network;
         data["isActive"] = this.isActive;
         data["isDefault"] = this.isDefault;
         return data;
     }
 
-    clone(): CreateNetworksDto {
+    clone(): CoinDto {
         const json = this.toJSON();
-        let result = new CreateNetworksDto();
+        let result = new CoinDto();
         result.init(json);
         return result;
     }
 }
 
-export interface ICreateNetworksDto {
-    name: string;
+export interface ICoinDto {
+    id: number;
+    symbol: string;
+    fullName: string;
+    network: string;
+    isActive: boolean;
+    isDefault: boolean;
+}
+
+export class CoinDtoIEnumerableResponseDto implements ICoinDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: CoinDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: ICoinDtoIEnumerableResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(CoinDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CoinDtoIEnumerableResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CoinDtoIEnumerableResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): CoinDtoIEnumerableResponseDto {
+        const json = this.toJSON();
+        let result = new CoinDtoIEnumerableResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICoinDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: CoinDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class CoinDtoPagedListResponseDto implements ICoinDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: CoinDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: ICoinDtoPagedListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(CoinDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CoinDtoPagedListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CoinDtoPagedListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): CoinDtoPagedListResponseDto {
+        const json = this.toJSON();
+        let result = new CoinDtoPagedListResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICoinDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: CoinDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class CoinDtoResponseDto implements ICoinDtoResponseDto {
+    isSuccess: boolean;
+    result: CoinDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: ICoinDtoResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"] ? CoinDto.fromJS(_data["result"]) : <any>undefined;
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CoinDtoResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CoinDtoResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): CoinDtoResponseDto {
+        const json = this.toJSON();
+        let result = new CoinDtoResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICoinDtoResponseDto {
+    isSuccess: boolean;
+    result: CoinDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class CreateCoinsDto implements ICreateCoinsDto {
+    symbol: string;
+    fullName: string;
+    network: string;
+    isActive: boolean;
+    isDefault: boolean;
+
+    constructor(data?: ICreateCoinsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.symbol = _data["symbol"];
+            this.fullName = _data["fullName"];
+            this.network = _data["network"];
+            this.isActive = _data["isActive"];
+            this.isDefault = _data["isDefault"];
+        }
+    }
+
+    static fromJS(data: any): CreateCoinsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCoinsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["symbol"] = this.symbol;
+        data["fullName"] = this.fullName;
+        data["network"] = this.network;
+        data["isActive"] = this.isActive;
+        data["isDefault"] = this.isDefault;
+        return data;
+    }
+
+    clone(): CreateCoinsDto {
+        const json = this.toJSON();
+        let result = new CreateCoinsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateCoinsDto {
+    symbol: string;
+    fullName: string;
+    network: string;
     isActive: boolean;
     isDefault: boolean;
 }
 
 export class CreateWalletDto implements ICreateWalletDto {
     walletGroupsId: number;
-    network: string;
+    coin: CoinDto;
 
     constructor(data?: ICreateWalletDto) {
         if (data) {
@@ -1167,12 +1494,15 @@ export class CreateWalletDto implements ICreateWalletDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.coin = new CoinDto();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
             this.walletGroupsId = _data["walletGroupsId"];
-            this.network = _data["network"];
+            this.coin = _data["coin"] ? CoinDto.fromJS(_data["coin"]) : new CoinDto();
         }
     }
 
@@ -1186,7 +1516,7 @@ export class CreateWalletDto implements ICreateWalletDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["walletGroupsId"] = this.walletGroupsId;
-        data["network"] = this.network;
+        data["coin"] = this.coin ? this.coin.toJSON() : <any>undefined;
         return data;
     }
 
@@ -1200,7 +1530,7 @@ export class CreateWalletDto implements ICreateWalletDto {
 
 export interface ICreateWalletDto {
     walletGroupsId: number;
-    network: string;
+    coin: CoinDto;
 }
 
 export class CreateWalletGroupDto implements ICreateWalletGroupDto {
@@ -1240,270 +1570,10 @@ export class CreateWalletGroupDto implements ICreateWalletGroupDto {
 export interface ICreateWalletGroupDto {
 }
 
-export class NetworkDto implements INetworkDto {
-    id: number;
-    name: string;
-    isActive: boolean;
-    isDefault: boolean;
-
-    constructor(data?: INetworkDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.isActive = _data["isActive"];
-            this.isDefault = _data["isDefault"];
-        }
-    }
-
-    static fromJS(data: any): NetworkDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new NetworkDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["isActive"] = this.isActive;
-        data["isDefault"] = this.isDefault;
-        return data;
-    }
-
-    clone(): NetworkDto {
-        const json = this.toJSON();
-        let result = new NetworkDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface INetworkDto {
-    id: number;
-    name: string;
-    isActive: boolean;
-    isDefault: boolean;
-}
-
-export class NetworkDtoIEnumerableResponseDto implements INetworkDtoIEnumerableResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: INetworkDtoIEnumerableResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            if (Array.isArray(_data["result"])) {
-                this.result = [] as any;
-                for (let item of _data["result"])
-                    this.result.push(NetworkDto.fromJS(item));
-            }
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): NetworkDtoIEnumerableResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new NetworkDtoIEnumerableResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        if (Array.isArray(this.result)) {
-            data["result"] = [];
-            for (let item of this.result)
-                data["result"].push(item.toJSON());
-        }
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): NetworkDtoIEnumerableResponseDto {
-        const json = this.toJSON();
-        let result = new NetworkDtoIEnumerableResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface INetworkDtoIEnumerableResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export class NetworkDtoPagedListResponseDto implements INetworkDtoPagedListResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: INetworkDtoPagedListResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            if (Array.isArray(_data["result"])) {
-                this.result = [] as any;
-                for (let item of _data["result"])
-                    this.result.push(NetworkDto.fromJS(item));
-            }
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): NetworkDtoPagedListResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new NetworkDtoPagedListResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        if (Array.isArray(this.result)) {
-            data["result"] = [];
-            for (let item of this.result)
-                data["result"].push(item.toJSON());
-        }
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): NetworkDtoPagedListResponseDto {
-        const json = this.toJSON();
-        let result = new NetworkDtoPagedListResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface INetworkDtoPagedListResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto[] | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
-export class NetworkDtoResponseDto implements INetworkDtoResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: INetworkDtoResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"] ? NetworkDto.fromJS(_data["result"]) : <any>undefined;
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): NetworkDtoResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new NetworkDtoResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): NetworkDtoResponseDto {
-        const json = this.toJSON();
-        let result = new NetworkDtoResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface INetworkDtoResponseDto {
-    isSuccess: boolean;
-    result: NetworkDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
 export class WalletDto implements IWalletDto {
     id: number;
     walletGroupsId: number;
-    network: string | undefined;
+    coin: CoinDto;
     balance: number;
     isActive: boolean;
 
@@ -1520,7 +1590,7 @@ export class WalletDto implements IWalletDto {
         if (_data) {
             this.id = _data["id"];
             this.walletGroupsId = _data["walletGroupsId"];
-            this.network = _data["network"];
+            this.coin = _data["coin"] ? CoinDto.fromJS(_data["coin"]) : <any>undefined;
             this.balance = _data["balance"];
             this.isActive = _data["isActive"];
         }
@@ -1537,7 +1607,7 @@ export class WalletDto implements IWalletDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["walletGroupsId"] = this.walletGroupsId;
-        data["network"] = this.network;
+        data["coin"] = this.coin ? this.coin.toJSON() : <any>undefined;
         data["balance"] = this.balance;
         data["isActive"] = this.isActive;
         return data;
@@ -1554,7 +1624,7 @@ export class WalletDto implements IWalletDto {
 export interface IWalletDto {
     id: number;
     walletGroupsId: number;
-    network: string | undefined;
+    coin: CoinDto;
     balance: number;
     isActive: boolean;
 }
@@ -1767,6 +1837,7 @@ export interface IWalletDtoResponseDto {
 export class WalletGroupDto implements IWalletGroupDto {
     id: number;
     userId: number;
+    tagName: string | undefined;
     wallets: WalletDto[] | undefined;
     isActive: boolean;
     isMain: boolean;
@@ -1784,6 +1855,7 @@ export class WalletGroupDto implements IWalletGroupDto {
         if (_data) {
             this.id = _data["id"];
             this.userId = _data["userId"];
+            this.tagName = _data["tagName"];
             if (Array.isArray(_data["wallets"])) {
                 this.wallets = [] as any;
                 for (let item of _data["wallets"])
@@ -1805,6 +1877,7 @@ export class WalletGroupDto implements IWalletGroupDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["userId"] = this.userId;
+        data["tagName"] = this.tagName;
         if (Array.isArray(this.wallets)) {
             data["wallets"] = [];
             for (let item of this.wallets)
@@ -1826,6 +1899,7 @@ export class WalletGroupDto implements IWalletGroupDto {
 export interface IWalletGroupDto {
     id: number;
     userId: number;
+    tagName: string | undefined;
     wallets: WalletDto[] | undefined;
     isActive: boolean;
     isMain: boolean;
