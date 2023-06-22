@@ -413,6 +413,718 @@ export class CoinServiceProxy {
 }
 
 @Injectable()
+export class ConfigSettingsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    get(): Observable<ConfigSettingsDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/Get";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoIEnumerableResponseDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ConfigSettingsDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoIEnumerableResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getById(id: number): Observable<ConfigSettingsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/GetById/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoResponseDto>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<ConfigSettingsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    add(body: CreateConfigSettingsDto | undefined): Observable<ConfigSettingsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/Add";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdd(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdd(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoResponseDto>;
+        }));
+    }
+
+    protected processAdd(response: HttpResponseBase): Observable<ConfigSettingsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: ConfigSettingsDto | undefined): Observable<ConfigSettingsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoResponseDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ConfigSettingsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    delete(id: number): Observable<ConfigSettingsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/Delete/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoResponseDto>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<ConfigSettingsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return Success
+     */
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<ConfigSettingsDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/ConfigSettings/GetAll?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigSettingsDtoPagedListResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigSettingsDtoPagedListResponseDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<ConfigSettingsDtoPagedListResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigSettingsDtoPagedListResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ConfigSettingsDtoPagedListResponseDto>(null as any);
+    }
+}
+
+@Injectable()
+export class CustoWalletServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param walletGroupName (optional) 
+     * @param chainType (optional) 
+     * @return Success
+     */
+    addWalletGroup(walletGroupName: string | undefined, chainType: CustoChains | undefined): Observable<CustoWalletGroupResponse> {
+        let url_ = this.baseUrl + "/api/CustoWallet/AddWalletGroup?";
+        if (walletGroupName === null)
+            throw new Error("The parameter 'walletGroupName' cannot be null.");
+        else if (walletGroupName !== undefined)
+            url_ += "WalletGroupName=" + encodeURIComponent("" + walletGroupName) + "&";
+        if (chainType === null)
+            throw new Error("The parameter 'chainType' cannot be null.");
+        else if (chainType !== undefined)
+            url_ += "chainType=" + encodeURIComponent("" + chainType) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddWalletGroup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddWalletGroup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CustoWalletGroupResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CustoWalletGroupResponse>;
+        }));
+    }
+
+    protected processAddWalletGroup(response: HttpResponseBase): Observable<CustoWalletGroupResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CustoWalletGroupResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CustoWalletGroupResponse>(null as any);
+    }
+
+    /**
+     * @param walletGroupName (optional) 
+     * @return Success
+     */
+    getWalletGroup(walletGroupName: string | undefined): Observable<CustoWalletGroupResponse> {
+        let url_ = this.baseUrl + "/api/CustoWallet/GetWalletGroup?";
+        if (walletGroupName === null)
+            throw new Error("The parameter 'walletGroupName' cannot be null.");
+        else if (walletGroupName !== undefined)
+            url_ += "WalletGroupName=" + encodeURIComponent("" + walletGroupName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetWalletGroup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetWalletGroup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CustoWalletGroupResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CustoWalletGroupResponse>;
+        }));
+    }
+
+    protected processGetWalletGroup(response: HttpResponseBase): Observable<CustoWalletGroupResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CustoWalletGroupResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CustoWalletGroupResponse>(null as any);
+    }
+
+    /**
+     * @param walletGroupId (optional) 
+     * @param chainType (optional) 
+     * @return Success
+     */
+    addWallet(walletGroupId: string | undefined, chainType: CustoChains | undefined): Observable<CustoWalletGroupResponse> {
+        let url_ = this.baseUrl + "/api/CustoWallet/AddWallet?";
+        if (walletGroupId === null)
+            throw new Error("The parameter 'walletGroupId' cannot be null.");
+        else if (walletGroupId !== undefined)
+            url_ += "WalletGroupId=" + encodeURIComponent("" + walletGroupId) + "&";
+        if (chainType === null)
+            throw new Error("The parameter 'chainType' cannot be null.");
+        else if (chainType !== undefined)
+            url_ += "chainType=" + encodeURIComponent("" + chainType) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddWallet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddWallet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CustoWalletGroupResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CustoWalletGroupResponse>;
+        }));
+    }
+
+    protected processAddWallet(response: HttpResponseBase): Observable<CustoWalletGroupResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CustoWalletGroupResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CustoWalletGroupResponse>(null as any);
+    }
+
+    /**
+     * @param transactionHash (optional) 
+     * @return Success
+     */
+    getTransactionRecord(transactionHash: string | undefined): Observable<TransactionRecordResponse> {
+        let url_ = this.baseUrl + "/api/CustoWallet/GetTransactionRecord?";
+        if (transactionHash === null)
+            throw new Error("The parameter 'transactionHash' cannot be null.");
+        else if (transactionHash !== undefined)
+            url_ += "transactionHash=" + encodeURIComponent("" + transactionHash) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTransactionRecord(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTransactionRecord(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionRecordResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionRecordResponse>;
+        }));
+    }
+
+    protected processGetTransactionRecord(response: HttpResponseBase): Observable<TransactionRecordResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionRecordResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionRecordResponse>(null as any);
+    }
+
+    /**
+     * @param walletAddress (optional) 
+     * @return Success
+     */
+    getWallet(walletAddress: string | undefined): Observable<CustoWallet> {
+        let url_ = this.baseUrl + "/api/CustoWallet/GetWallet?";
+        if (walletAddress === null)
+            throw new Error("The parameter 'walletAddress' cannot be null.");
+        else if (walletAddress !== undefined)
+            url_ += "WalletAddress=" + encodeURIComponent("" + walletAddress) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetWallet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetWallet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CustoWallet>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CustoWallet>;
+        }));
+    }
+
+    protected processGetWallet(response: HttpResponseBase): Observable<CustoWallet> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CustoWallet.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CustoWallet>(null as any);
+    }
+
+    /**
+     * @param toAddress (optional) 
+     * @param amount (optional) 
+     * @param coin (optional) 
+     * @return Success
+     */
+    transfer(toAddress: string | undefined, amount: string | undefined, coin: CustoCoins | undefined): Observable<TransferResponse> {
+        let url_ = this.baseUrl + "/api/CustoWallet/Transfer?";
+        if (toAddress === null)
+            throw new Error("The parameter 'toAddress' cannot be null.");
+        else if (toAddress !== undefined)
+            url_ += "toAddress=" + encodeURIComponent("" + toAddress) + "&";
+        if (amount === null)
+            throw new Error("The parameter 'amount' cannot be null.");
+        else if (amount !== undefined)
+            url_ += "amount=" + encodeURIComponent("" + amount) + "&";
+        if (coin === null)
+            throw new Error("The parameter 'coin' cannot be null.");
+        else if (coin !== undefined)
+            url_ += "coin=" + encodeURIComponent("" + coin) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTransfer(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTransfer(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransferResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransferResponse>;
+        }));
+    }
+
+    protected processTransfer(response: HttpResponseBase): Observable<TransferResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransferResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransferResponse>(null as any);
+    }
+}
+
+@Injectable()
 export class WalletServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -1156,6 +1868,53 @@ export class WalletGroupsServiceProxy {
     }
 }
 
+export class AddressAmount implements IAddressAmount {
+    address: string | undefined;
+    amount: number;
+
+    constructor(data?: IAddressAmount) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.address = _data["address"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): AddressAmount {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddressAmount();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["address"] = this.address;
+        data["amount"] = this.amount;
+        return data;
+    }
+
+    clone(): AddressAmount {
+        const json = this.toJSON();
+        let result = new AddressAmount();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddressAmount {
+    address: string | undefined;
+    amount: number;
+}
+
 export class CoinDto implements ICoinDto {
     id: number;
     symbol: string;
@@ -1424,6 +2183,262 @@ export interface ICoinDtoResponseDto {
     errorMessages: string[] | undefined;
 }
 
+export class ConfigSettingsDto implements IConfigSettingsDto {
+    id: number;
+    name: string | undefined;
+    value: string | undefined;
+
+    constructor(data?: IConfigSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): ConfigSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["value"] = this.value;
+        return data;
+    }
+
+    clone(): ConfigSettingsDto {
+        const json = this.toJSON();
+        let result = new ConfigSettingsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IConfigSettingsDto {
+    id: number;
+    name: string | undefined;
+    value: string | undefined;
+}
+
+export class ConfigSettingsDtoIEnumerableResponseDto implements IConfigSettingsDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IConfigSettingsDtoIEnumerableResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(ConfigSettingsDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ConfigSettingsDtoIEnumerableResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigSettingsDtoIEnumerableResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): ConfigSettingsDtoIEnumerableResponseDto {
+        const json = this.toJSON();
+        let result = new ConfigSettingsDtoIEnumerableResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IConfigSettingsDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class ConfigSettingsDtoPagedListResponseDto implements IConfigSettingsDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IConfigSettingsDtoPagedListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(ConfigSettingsDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ConfigSettingsDtoPagedListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigSettingsDtoPagedListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): ConfigSettingsDtoPagedListResponseDto {
+        const json = this.toJSON();
+        let result = new ConfigSettingsDtoPagedListResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IConfigSettingsDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class ConfigSettingsDtoResponseDto implements IConfigSettingsDtoResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IConfigSettingsDtoResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"] ? ConfigSettingsDto.fromJS(_data["result"]) : <any>undefined;
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ConfigSettingsDtoResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigSettingsDtoResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): ConfigSettingsDtoResponseDto {
+        const json = this.toJSON();
+        let result = new ConfigSettingsDtoResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IConfigSettingsDtoResponseDto {
+    isSuccess: boolean;
+    result: ConfigSettingsDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
 export class CreateCoinsDto implements ICreateCoinsDto {
     symbol: string;
     fullName: string;
@@ -1481,6 +2496,53 @@ export interface ICreateCoinsDto {
     network: string;
     isActive: boolean;
     isDefault: boolean;
+}
+
+export class CreateConfigSettingsDto implements ICreateConfigSettingsDto {
+    name: string;
+    value: string;
+
+    constructor(data?: ICreateConfigSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): CreateConfigSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateConfigSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["value"] = this.value;
+        return data;
+    }
+
+    clone(): CreateConfigSettingsDto {
+        const json = this.toJSON();
+        let result = new CreateConfigSettingsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateConfigSettingsDto {
+    name: string;
+    value: string;
 }
 
 export class CreateWalletDto implements ICreateWalletDto {
@@ -1568,6 +2630,253 @@ export class CreateWalletGroupDto implements ICreateWalletGroupDto {
 }
 
 export interface ICreateWalletGroupDto {
+}
+
+export enum CustoChains {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
+export enum CustoCoins {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+}
+
+export class CustoWallet implements ICustoWallet {
+    address: string | undefined;
+    coinType: CustoCoins;
+    balance: number;
+
+    constructor(data?: ICustoWallet) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.address = _data["address"];
+            this.coinType = _data["coinType"];
+            this.balance = _data["balance"];
+        }
+    }
+
+    static fromJS(data: any): CustoWallet {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustoWallet();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["address"] = this.address;
+        data["coinType"] = this.coinType;
+        data["balance"] = this.balance;
+        return data;
+    }
+
+    clone(): CustoWallet {
+        const json = this.toJSON();
+        let result = new CustoWallet();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustoWallet {
+    address: string | undefined;
+    coinType: CustoCoins;
+    balance: number;
+}
+
+export class CustoWalletGroupResponse implements ICustoWalletGroupResponse {
+    walletGroupId: string | undefined;
+    wallet: CustoWallet[] | undefined;
+
+    constructor(data?: ICustoWalletGroupResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.walletGroupId = _data["walletGroupId"];
+            if (Array.isArray(_data["wallet"])) {
+                this.wallet = [] as any;
+                for (let item of _data["wallet"])
+                    this.wallet.push(CustoWallet.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CustoWalletGroupResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustoWalletGroupResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["walletGroupId"] = this.walletGroupId;
+        if (Array.isArray(this.wallet)) {
+            data["wallet"] = [];
+            for (let item of this.wallet)
+                data["wallet"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): CustoWalletGroupResponse {
+        const json = this.toJSON();
+        let result = new CustoWalletGroupResponse();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustoWalletGroupResponse {
+    walletGroupId: string | undefined;
+    wallet: CustoWallet[] | undefined;
+}
+
+export class TransactionRecordResponse implements ITransactionRecordResponse {
+    transactionHash: string | undefined;
+    coinType: CustoCoins;
+    fromAddress: AddressAmount[] | undefined;
+    toAddress: AddressAmount[] | undefined;
+    status: TransactionStatus;
+    fee: number;
+
+    constructor(data?: ITransactionRecordResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.transactionHash = _data["transactionHash"];
+            this.coinType = _data["coinType"];
+            if (Array.isArray(_data["fromAddress"])) {
+                this.fromAddress = [] as any;
+                for (let item of _data["fromAddress"])
+                    this.fromAddress.push(AddressAmount.fromJS(item));
+            }
+            if (Array.isArray(_data["toAddress"])) {
+                this.toAddress = [] as any;
+                for (let item of _data["toAddress"])
+                    this.toAddress.push(AddressAmount.fromJS(item));
+            }
+            this.status = _data["status"];
+            this.fee = _data["fee"];
+        }
+    }
+
+    static fromJS(data: any): TransactionRecordResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionRecordResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["transactionHash"] = this.transactionHash;
+        data["coinType"] = this.coinType;
+        if (Array.isArray(this.fromAddress)) {
+            data["fromAddress"] = [];
+            for (let item of this.fromAddress)
+                data["fromAddress"].push(item.toJSON());
+        }
+        if (Array.isArray(this.toAddress)) {
+            data["toAddress"] = [];
+            for (let item of this.toAddress)
+                data["toAddress"].push(item.toJSON());
+        }
+        data["status"] = this.status;
+        data["fee"] = this.fee;
+        return data;
+    }
+
+    clone(): TransactionRecordResponse {
+        const json = this.toJSON();
+        let result = new TransactionRecordResponse();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITransactionRecordResponse {
+    transactionHash: string | undefined;
+    coinType: CustoCoins;
+    fromAddress: AddressAmount[] | undefined;
+    toAddress: AddressAmount[] | undefined;
+    status: TransactionStatus;
+    fee: number;
+}
+
+export enum TransactionStatus {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
+export class TransferResponse implements ITransferResponse {
+    transactionHash: string | undefined;
+
+    constructor(data?: ITransferResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.transactionHash = _data["transactionHash"];
+        }
+    }
+
+    static fromJS(data: any): TransferResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransferResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["transactionHash"] = this.transactionHash;
+        return data;
+    }
+
+    clone(): TransferResponse {
+        const json = this.toJSON();
+        let result = new TransferResponse();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITransferResponse {
+    transactionHash: string | undefined;
 }
 
 export class WalletDto implements IWalletDto {

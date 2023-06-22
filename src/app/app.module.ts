@@ -24,18 +24,22 @@ import { TwoFactorAuthPageComponent } from './two-factor-auth/two-factor-auth-pa
 import { ToastrModule } from 'ngx-toastr';
 import { WalletGroupComponent } from './wallet-group/wallet-group.component';
 import { WalletComponent } from './wallet/wallet.component'
+import { RegistrationComponent } from './register/register.component';
+import { ForgotpasswordComponent } from './forgotpassword/forgotpassword.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
+    RegistrationComponent,
     HomeComponent,
     TwoFactorAuthModalComponent,
     SecretPlaceComponent,
     TwoFactorAuthSetupComponent,
     TwoFactorAuthPageComponent,
     WalletGroupComponent,
-    WalletComponent
+    WalletComponent,
+    ForgotpasswordComponent
   ],
   imports: [
     BrowserModule,

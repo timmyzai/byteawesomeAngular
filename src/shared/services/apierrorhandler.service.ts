@@ -18,4 +18,14 @@ export class ApiErrorHandlerService {
       }
     }
   }
+  handleSuccessResponse(responseDto: any, successMessageTitle: string) {
+    if (responseDto.isSuccess) {
+      const successMessage = responseDto.successMessage;
+      if (successMessage && successMessage.length > 0) {
+        this.notify.showSuccess(successMessage.join(', '), successMessageTitle);
+      } else {
+        this.notify.showError('No success message', successMessageTitle);
+      }
+    }
+  }
 }
