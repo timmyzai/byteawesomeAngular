@@ -4,8 +4,10 @@
   </div>
   <div class="card-body">
     <h5 class="card-title">ID: {{ wallet.id }}</h5>
-    <p class="card-text">Coin: {{ wallet.coin.network}}</p>
+    <h5 class="card-text">Address: {{ wallet.address }}</h5>
+    <p class="card-text">Coin: {{ wallet.coin.fSymbol }} ({{ wallet.coin.fNetwork }})</p>
     <p class="card-text">Balance: {{ wallet.balance }}</p>
+    <p class="card-text">IsCWCreated: {{ wallet.isCustoWalletCreated }}</p>
     <p class="card-text">Active: <button (click)="confirmUpdate()">{{wallet.isActive}}</button></p>
   </div>
 </div>

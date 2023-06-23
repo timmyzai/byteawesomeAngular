@@ -5,7 +5,12 @@
       <tr class="text-center">
         <th>ID</th>
         <th>User ID</th>
+        <th>TagName</th>
         <th>Active</th>
+        <th>IsMain</th>
+        <th>IsCustoWGCreated</th>
+        <th>CustoWG Id</th>
+        <th>CustoWG Name</th>
         <th>Wallets</th>
       </tr>
     </thead>
@@ -13,7 +18,15 @@
       <tr *ngFor="let walletGroup of walletGroups">
         <td>{{ walletGroup.id }}</td>
         <td>{{ walletGroup.userId }}</td>
-        <td><button (click)="confirmUpdate(walletGroup.id)">{{walletGroup.isActive}}</button></td>
+        <td>{{ walletGroup.tagName }}</td>
+        <td><button (click)="confirmUpdate(walletGroup.id)">{{ walletGroup.isActive }}</button></td>
+        <td>{{ walletGroup.isMain }}</td>
+        <td>{{ walletGroup.isCustoWalletGroupCreated }}</td>
+        <td>
+          {{ walletGroup.custoWalletGroupId }}
+          <button *ngIf="walletGroup.custoWalletGroupId === null" >Create</button>
+        </td>
+        <td>{{ walletGroup.custoWalletGroupName }}</td>
         <td>
           <div class="dropdown" *ngIf="walletGroup.wallets && walletGroup.wallets.length > 0; else noWallet">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="walletsDropdown"
@@ -24,16 +37,22 @@
               <ng-container *ngFor="let wallet of walletGroup.wallets">
                 <a class="dropdown-item" (click)="navigateToWallet(wallet.id)">
                   <div class="d-flex flex-column">
-                    <span class="fw-bold">ID:{{ wallet.id }}</span>
+                    <span class="fw-bold">ID: {{ wallet.id }}</span>
                   </div>
                   <div class="d-flex flex-column">
-                    <span class="fw-bold">Coin:{{ wallet.coin.symbol }} ({{ wallet.coin.network }})</span>
+                    <span class="fw-bold">Address: {{ wallet.address }}</span>
                   </div>
                   <div class="d-flex flex-column">
-                    <span class="fw-bold">Balance:{{ wallet.balance }}</span>
+                    <span class="fw-bold">Coin: {{ wallet.coin.fSymbol }} ({{ wallet.coin.fNetwork }})</span>
                   </div>
                   <div class="d-flex flex-column">
-                    <span class="fw-bold">Active:{{ wallet.isActive }}</span>
+                    <span class="fw-bold">Balance: {{ wallet.balance }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">IsCWCreated: {{ wallet.isCustoWalletCreated }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Active: {{ wallet.isActive }}</span>
                   </div>
                 </a>
               </ng-container>
@@ -67,7 +86,7 @@
     <label>
       Coin:
       <select name="selectedCoinId" [(ngModel)]="selectedCoinId" required>
-        <option *ngFor="let coin of coinList" [value]="coin.id">{{ coin.symbol }} ({{ coin.network }})
+        <option *ngFor="let coin of coinList" [value]="coin.id">{{ coin.fSymbol }} ({{ coin.fNetwork }})
         </option>
       </select>
     </label>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CreateWalletDto, CreateWalletGroupDto, CoinDto, CoinDtoIEnumerableResponseDto, CoinServiceProxy, WalletDtoResponseDto, WalletGroupDto, WalletGroupDtoIEnumerableResponseDto, WalletGroupDtoResponseDto, WalletGroupsServiceProxy, WalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
+import { CreateWalletDto, CreateWalletGroupDto, CoinDto, CoinDtoIEnumerableResponseDto, CoinServiceProxy, WalletDtoResponseDto, WalletGroupDto, WalletGroupDtoIEnumerableResponseDto, WalletGroupDtoResponseDto, WalletGroupsServiceProxy, WalletServiceProxy, CustoWalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
 import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
 
 @Component({
@@ -20,6 +20,7 @@ export class WalletGroupComponent implements OnInit {
   constructor(
     private walletGroupServices: WalletGroupsServiceProxy,
     private walletServices: WalletServiceProxy,
+    private custoWalletService: CustoWalletServiceProxy,
     private coinServices: CoinServiceProxy,
     private errorHandler: ApiErrorHandlerService,
     private router: Router
@@ -89,6 +90,18 @@ export class WalletGroupComponent implements OnInit {
   }
 
   async updateWalletGroup(walletGroupId: number) {
+    try {
+      var param = this.walletGroups.find(x => x.id == walletGroupId);
+      param.isActive = !param.isActive;
+      const walletGroupResponseDto: WalletGroupDtoResponseDto = await this.walletGroupServices.update(param).toPromise();
+      this.errorHandler.handleErrorResponse(walletGroupResponseDto, 'Wallet group update Failed');
+    } finally {
+      this.getWalletGroup();
+      this.userId = undefined;
+    }
+  }
+
+  async createCustoWalletGroup(walletGroupId: number) {
     try {
       var param = this.walletGroups.find(x => x.id == walletGroupId);
       param.isActive = !param.isActive;
