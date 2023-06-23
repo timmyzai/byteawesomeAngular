@@ -742,9 +742,10 @@ export class UserGrpcClientServiceProxy {
      * @param isLockedOut (optional) 
      * @param displayName (optional) 
      * @param roles (optional) 
+     * @param isEmailVerified (optional) 
      * @return Success
      */
-    addUser(id: number | undefined, firstName: string | undefined, lastName: string | undefined, userName: string | undefined, emailAddress: string | undefined, passWord: string | undefined, kycApprovedDate_Seconds: number | undefined, kycApprovedDate_Nanos: number | undefined, isKycApproved: boolean | undefined, isTwoFactorEnabled: boolean | undefined, isActive: boolean | undefined, isLockedOut: boolean | undefined, displayName: string | undefined, roles: RolesProtoDto[] | undefined): Observable<UserDto> {
+    addUser(id: number | undefined, firstName: string | undefined, lastName: string | undefined, userName: string | undefined, emailAddress: string | undefined, passWord: string | undefined, kycApprovedDate_Seconds: number | undefined, kycApprovedDate_Nanos: number | undefined, isKycApproved: boolean | undefined, isTwoFactorEnabled: boolean | undefined, isActive: boolean | undefined, isLockedOut: boolean | undefined, displayName: string | undefined, roles: RolesProtoDto[] | undefined, isEmailVerified: boolean | undefined): Observable<UserDto> {
         let url_ = this.baseUrl + "/api/UserGrpcClient/AddUser?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -807,6 +808,10 @@ export class UserGrpcClientServiceProxy {
         				url_ += "Roles[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (isEmailVerified === null)
+            throw new Error("The parameter 'isEmailVerified' cannot be null.");
+        else if (isEmailVerified !== undefined)
+            url_ += "IsEmailVerified=" + encodeURIComponent("" + isEmailVerified) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -924,9 +929,10 @@ export class UserGrpcClientServiceProxy {
      * @param isLockedOut (optional) 
      * @param displayName (optional) 
      * @param roles (optional) 
+     * @param isEmailVerified (optional) 
      * @return Success
      */
-    updateUser(id: number | undefined, firstName: string | undefined, lastName: string | undefined, userName: string | undefined, emailAddress: string | undefined, passWord: string | undefined, kycApprovedDate_Seconds: number | undefined, kycApprovedDate_Nanos: number | undefined, isKycApproved: boolean | undefined, isTwoFactorEnabled: boolean | undefined, isActive: boolean | undefined, isLockedOut: boolean | undefined, displayName: string | undefined, roles: RolesProtoDto[] | undefined): Observable<UserDto> {
+    updateUser(id: number | undefined, firstName: string | undefined, lastName: string | undefined, userName: string | undefined, emailAddress: string | undefined, passWord: string | undefined, kycApprovedDate_Seconds: number | undefined, kycApprovedDate_Nanos: number | undefined, isKycApproved: boolean | undefined, isTwoFactorEnabled: boolean | undefined, isActive: boolean | undefined, isLockedOut: boolean | undefined, displayName: string | undefined, roles: RolesProtoDto[] | undefined, isEmailVerified: boolean | undefined): Observable<UserDto> {
         let url_ = this.baseUrl + "/api/UserGrpcClient/UpdateUser?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -989,6 +995,10 @@ export class UserGrpcClientServiceProxy {
         				url_ += "Roles[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (isEmailVerified === null)
+            throw new Error("The parameter 'isEmailVerified' cannot be null.");
+        else if (isEmailVerified !== undefined)
+            url_ += "IsEmailVerified=" + encodeURIComponent("" + isEmailVerified) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1482,6 +1492,7 @@ export enum LoginResultType {
     _3 = 3,
     _4 = 4,
     _5 = 5,
+    _6 = 6,
 }
 
 export class RolesDto implements IRolesDto {
@@ -1853,6 +1864,7 @@ export class UserDto implements IUserDto {
     isLockedOut: boolean;
     readonly displayName: string | undefined;
     roles: RolesDto[];
+    isEmailVerified: boolean;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -1886,6 +1898,7 @@ export class UserDto implements IUserDto {
                 for (let item of _data["roles"])
                     this.roles.push(RolesDto.fromJS(item));
             }
+            this.isEmailVerified = _data["isEmailVerified"];
         }
     }
 
@@ -1916,6 +1929,7 @@ export class UserDto implements IUserDto {
             for (let item of this.roles)
                 data["roles"].push(item.toJSON());
         }
+        data["isEmailVerified"] = this.isEmailVerified;
         return data;
     }
 
@@ -1942,6 +1956,7 @@ export interface IUserDto {
     isLockedOut: boolean;
     displayName: string | undefined;
     roles: RolesDto[];
+    isEmailVerified: boolean;
 }
 
 export class ApiException extends Error {
