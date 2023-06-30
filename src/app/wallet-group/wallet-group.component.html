@@ -24,7 +24,8 @@
         <td>{{ walletGroup.isCustoWalletGroupCreated }}</td>
         <td>
           {{ walletGroup.custoWalletGroupId }}
-          <button *ngIf="walletGroup.custoWalletGroupId === null" >Create</button>
+          <button *ngIf="walletGroup.custoWalletGroupId === null"
+            (click)="createCustoWalletGroup(walletGroup.id)">Create</button>
         </td>
         <td>{{ walletGroup.custoWalletGroupName }}</td>
         <td>
@@ -41,18 +42,6 @@
                   </div>
                   <div class="d-flex flex-column">
                     <span class="fw-bold">Address: {{ wallet.address }}</span>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold">Coin: {{ wallet.coin.fSymbol }} ({{ wallet.coin.fNetwork }})</span>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold">Balance: {{ wallet.balance }}</span>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold">IsCWCreated: {{ wallet.isCustoWalletCreated }}</span>
-                  </div>
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold">Active: {{ wallet.isActive }}</span>
                   </div>
                 </a>
               </ng-container>

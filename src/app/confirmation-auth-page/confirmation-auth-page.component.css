@@ -81,13 +81,3 @@
 .button-spacing {
     margin-right: 10px;
 }
-.input-group {
-    position: relative;
-}
-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}

@@ -1,0 +1,29 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">2FA Code</h5>
+    <button type="button" class="close close-button" aria-label="Close" (click)="hideModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form novalidate autocomplete="off" #pinInputBoxKeyForm="ngForm" (ngSubmit)="submit()">
+      <div class="form-group otp-box">
+        <input type="text" id="otpInput" maxlength="6" (input)="onOtpChange($event)" />
+        <div id="otpBoxes" class="otp-boxes">
+          <span *ngFor="let box of otpBoxes; let i = index" [class.filled]="box !== ''">{{ box }}</span>
+        </div>
+      </div>
+      <div *ngIf="isInvalidPin" class="error-message">
+        Wrong PIN. Please try again.
+      </div>
+      
+      <div class="form-group row">
+        <div class="col-md-12">
+          <button [disabled]="!isValidInput" type="submit" class="btn btn-primary btn-block">
+            Submit
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

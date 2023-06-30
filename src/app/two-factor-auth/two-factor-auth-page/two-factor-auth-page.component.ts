@@ -1,4 +1,4 @@
-import { Component, EventEmitter, } from '@angular/core';
+import { Component, } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
 import { AppAuthService } from 'src/shared/auth/app-auth.service';
@@ -19,8 +19,7 @@ export class TwoFactorAuthPageComponent {
   otpBoxes: string[] = Array(this.otpLength).fill('');
   isValidInput: Boolean = false;
   isInvalidPin: Boolean = false;
-  validateTwoFactorResult: EventEmitter<boolean> = new EventEmitter<boolean>();
-  submitting: boolean;
+  submitting: boolean = false;
 
   constructor(
     private route: Router,

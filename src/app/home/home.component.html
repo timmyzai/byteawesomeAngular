@@ -1,10 +1,27 @@
 <div [@routerTransition]>
     <div>
-        <h1>Welcome to the Home Page!</h1>
-        <p>You have been logged in.</p>
+        <h1>Welcome {{ user?.userName }} to the Home Page!</h1>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>isEmailVerified</th>
+                <th>isPhoneVerified</th>
+                <th>isTwoFactorEnabled</th>
+            </tr>
+            <tr>
+                <td id="id">{{ user?.id }}</td>
+                <td id="emailAddress">{{ user?.emailAddress }}</td>
+                <td id="isEmailVerified">{{ user?.isEmailVerified }}</td>
+                <td id="isPhoneVerified">{{ user?.isPhoneVerified }}</td>
+                <td id="isTwoFactorEnabled">{{ user?.isTwoFactorEnabled }}</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <p>Logout Here</p>
         <button (click)="logout()">Logout</button>
     </div>
-
     <div>
         <p>Setup Two Factors Auth</p>
         <button (click)="twoFactorSetup()">Setup 2FA</button>

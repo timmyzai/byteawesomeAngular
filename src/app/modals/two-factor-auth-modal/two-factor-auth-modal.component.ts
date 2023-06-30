@@ -41,7 +41,7 @@ export class TwoFactorAuthModalComponent {
   }
 
   submit() {
-      const userId = parseInt(localStorage.getItem('loggedInUserId'));
+      const userId = localStorage.getItem('loggedInUserId');
     const twoFactorPin = this.otpBoxes.join('');
     this._twoFactorAuthService.validateTwoFactorPIN(userId, twoFactorPin).subscribe(
       (boolResponseDto) => {

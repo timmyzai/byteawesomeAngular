@@ -15,7 +15,6 @@ import { TokenInterceptor } from './TokenInterceptor';
         WalletApiServiceProxies.CoinServiceProxy,
         WalletApiServiceProxies.WalletGroupsServiceProxy,
         WalletApiServiceProxies.WalletServiceProxy,
-        WalletApiServiceProxies.CustoWalletServiceProxy,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: TokenInterceptor,

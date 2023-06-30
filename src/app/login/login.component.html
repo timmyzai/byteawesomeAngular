@@ -1,13 +1,13 @@
 <div [@routerTransition]>
-  <div class="card form-box mx-auto my-auto">
+  <div class="card form-box mx-auto my-auto col-4">
     <h4 class="card-header text-center">{{ "LogIn" }}</h4>
     <div class="card-body">
       <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()">
         <div class="form-group mt-3">
           <div class="input-group">
-            <input type="text" class="form-control" name="userNameOrEmailAddress"
-              [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress" [placeholder]="'UserNameOrEmail'"
-              required maxlength="256" #userNameOrEmailAddressModel="ngModel" #userNameOrEmailAddressEl />
+            <input type="text" class="form-control" name="userLoginIdentity"
+              [(ngModel)]="authService.authenticateModel.userLoginIdentity" [placeholder]="'UserNameOrEmail'" required
+              maxlength="256" #userLoginIdentityModel="ngModel" #userLoginIdentityEl />
           </div>
         </div>
         <div class="form-group mt-3">
@@ -32,7 +32,22 @@
               {{ "LogIn" }}
             </button>
           </div>
-          <div class="register-wrap ng-tns-c37-1"><span class="ng-tns-c37-1">New User? </span><a routerLink="/register" class="ng-tns-c37-1">create an account</a></div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="register-wrap ">
+              <span>New User? </span>
+              <br>
+              <a routerLink="/register">create an account</a>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="register-wrap ">
+              <span>Forgot Possword? </span>
+              <br>
+              <a routerLink="/forgotpassword-page">click here</a>
+            </div>
+          </div>
         </div>
       </form>
     </div>

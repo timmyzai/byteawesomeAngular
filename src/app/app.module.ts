@@ -15,7 +15,8 @@ import { AUTH_API_BASE_URL } from 'src/shared/service-proxies/auth-service-proxi
 import { USER_API_BASE_URL } from 'src/shared/service-proxies/user-service-proxies';
 import { WALLET_API_BASE_URL } from 'src/shared/service-proxies/wallet-service-proxies';
 import { HomeComponent } from './home/home.component';
-import { TwoFactorAuthModalComponent } from './two-factor-auth/two-factor-auth-modal/two-factor-auth-modal.component';
+import { TwoFactorAuthModalComponent } from './modals/two-factor-auth-modal/two-factor-auth-modal.component';
+
 import { SecretPlaceComponent } from './secret-place/secret-place.component';
 import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-setup/two-factor-auth-setup.component';
 
@@ -26,6 +27,8 @@ import { WalletGroupComponent } from './wallet-group/wallet-group.component';
 import { WalletComponent } from './wallet/wallet.component'
 import { RegistrationComponent } from './register/register.component';
 import { ForgotpasswordComponent } from './forgotpassword/forgotpassword.component';
+import { ConfirmationAuthPageComponent } from './confirmation-auth-page/confirmation-auth-page.component';
+import { PinInputBoxModalComponent } from './modals/pin-input-box-modal/pin-input-box-modal.component';
 
 @NgModule({
   declarations: [
@@ -34,12 +37,14 @@ import { ForgotpasswordComponent } from './forgotpassword/forgotpassword.compone
     RegistrationComponent,
     HomeComponent,
     TwoFactorAuthModalComponent,
+    PinInputBoxModalComponent,
     SecretPlaceComponent,
     TwoFactorAuthSetupComponent,
     TwoFactorAuthPageComponent,
     WalletGroupComponent,
     WalletComponent,
-    ForgotpasswordComponent
+    ForgotpasswordComponent,
+    ConfirmationAuthPageComponent,
   ],
   imports: [
     BrowserModule,

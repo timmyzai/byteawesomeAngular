@@ -35,7 +35,7 @@
                                     <h5 class="text-center mt-2 auth-key">{{serial}}</h5>
                                 </div>
                                 <div class="mt-3 col-12 col-md-4 rounded qr-code-container">
-                                    <img src="{{authDetails.twoFactorQrImgUrl}}" alt="..." class="qr-code">
+                                    <img *ngIf="authDetails" src="{{authDetails.twoFactorQrImgUrl}}" alt="..." class="qr-code">
                                 </div>
                             </div>
                         </div>

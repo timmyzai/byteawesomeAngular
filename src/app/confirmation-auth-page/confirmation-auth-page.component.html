@@ -1,0 +1,39 @@
+<div [@routerTransition]>
+    <div class="page-content">
+        <div class="loader" *ngIf="submitting"></div>
+        <div class="card form-box mx-auto my-auto">
+            <h4 class="card-header text-center">
+                {{ "Confirmation OTP Code" }}
+            </h4>
+            <div class="card-body">
+                <div class="page-body">
+                    <form novalidate autocomplete="off" id="authKeyForm" (submit)="submit()">
+                        <div class="form-group otp-box">
+                            <input type="text" id="otpInput" maxlength="6" (input)="onOtpChange($event)" />
+                            <div id="otpBoxes" class="otp-boxes">
+                                <span *ngFor="let box of otpBoxes; let i = index" [class.filled]="box !== ''">{{ box
+                                    }}</span>
+                            </div>
+                        </div>
+                        <div *ngIf="isInvalidPin" class="error-message">
+                            Wrong Tac Code. Please try again.
+                        </div>
+                        <div class="form-group row text-center">
+                            <div class="col-md-12 mt-3">
+                                <button [disabled]="!isValidInput" type="submit" class="btn btn-primary button-spacing">
+                                    Submit
+                                </button>
+                                <button class="btn btn-primary button-spacing" [disabled]="isResendClicked" (click)="sendConfirmationEmail()">
+                                    Send
+                                </button>
+                                <button class="btn btn-primary" (click)="back()">
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -18,7 +18,7 @@ export class SecretPlaceComponent implements OnInit {
   ) {
   }
   ngOnInit(): void {
-    const userId = parseInt(localStorage.getItem('loggedInUserId'));
+    const userId = localStorage.getItem('loggedInUserId');
     this._userService.getById(userId).subscribe(
       (userDtoResponseDto: UserDtoResponseDto) => {
         if (userDtoResponseDto.result.isTwoFactorEnabled) {

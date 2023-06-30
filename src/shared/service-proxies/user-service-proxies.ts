@@ -18,6 +18,141 @@ import { DateTime, Duration } from "luxon";
 export const USER_API_BASE_URL = new InjectionToken<string>('USER_API_BASE_URL');
 
 @Injectable()
+export class OtpGrpcClientServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(USER_API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param email (optional) 
+     * @param type (optional) 
+     * @return Success
+     */
+    add(email: string | undefined, type: OtpProtoType | undefined): Observable<OtpDto> {
+        let url_ = this.baseUrl + "/api/OtpGrpcClient/Add?";
+        if (email === null)
+            throw new Error("The parameter 'email' cannot be null.");
+        else if (email !== undefined)
+            url_ += "Email=" + encodeURIComponent("" + email) + "&";
+        if (type === null)
+            throw new Error("The parameter 'type' cannot be null.");
+        else if (type !== undefined)
+            url_ += "Type=" + encodeURIComponent("" + type) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdd(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdd(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<OtpDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<OtpDto>;
+        }));
+    }
+
+    protected processAdd(response: HttpResponseBase): Observable<OtpDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = OtpDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<OtpDto>(null as any);
+    }
+
+    /**
+     * @param email (optional) 
+     * @param tacCode (optional) 
+     * @return Success
+     */
+    verify(email: string | undefined, tacCode: string | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/OtpGrpcClient/Verify?";
+        if (email === null)
+            throw new Error("The parameter 'email' cannot be null.");
+        else if (email !== undefined)
+            url_ += "Email=" + encodeURIComponent("" + email) + "&";
+        if (tacCode === null)
+            throw new Error("The parameter 'tacCode' cannot be null.");
+        else if (tacCode !== undefined)
+            url_ += "TacCode=" + encodeURIComponent("" + tacCode) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processVerify(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processVerify(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processVerify(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(null as any);
+    }
+}
+
+@Injectable()
 export class RoleServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -197,7 +332,7 @@ export class RoleServiceProxy {
     /**
      * @return Success
      */
-    getById(id: number): Observable<RolesDtoResponseDto> {
+    getById(id: string): Observable<RolesDtoResponseDto> {
         let url_ = this.baseUrl + "/api/Role/GetById/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -307,7 +442,7 @@ export class RoleServiceProxy {
     /**
      * @return Success
      */
-    delete(id: number): Observable<RolesDtoResponseDto> {
+    delete(id: string): Observable<RolesDtoResponseDto> {
         let url_ = this.baseUrl + "/api/Role/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -435,8 +570,8 @@ export class UserServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    add(body: CreateUserDto | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/Add";
+    register(body: CreateUserDto | undefined): Observable<UserDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/Register";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -452,11 +587,11 @@ export class UserServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAdd(response_);
+            return this.processRegister(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAdd(response_ as any);
+                    return this.processRegister(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
                 }
@@ -465,7 +600,7 @@ export class UserServiceProxy {
         }));
     }
 
-    protected processAdd(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processRegister(response: HttpResponseBase): Observable<UserDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -488,16 +623,16 @@ export class UserServiceProxy {
     }
 
     /**
-     * @param usernameOrEmailAddress (optional) 
+     * @param userLoginIdentityAddress (optional) 
      * @param password (optional) 
      * @return Success
      */
-    validateUserCredentials(usernameOrEmailAddress: string | undefined, password: string | undefined): Observable<LoginResultDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/ValidateUserCredentials?";
-        if (usernameOrEmailAddress === null)
-            throw new Error("The parameter 'usernameOrEmailAddress' cannot be null.");
-        else if (usernameOrEmailAddress !== undefined)
-            url_ += "usernameOrEmailAddress=" + encodeURIComponent("" + usernameOrEmailAddress) + "&";
+    login(userLoginIdentityAddress: string | undefined, password: string | undefined): Observable<LoginResultDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/Login?";
+        if (userLoginIdentityAddress === null)
+            throw new Error("The parameter 'userLoginIdentityAddress' cannot be null.");
+        else if (userLoginIdentityAddress !== undefined)
+            url_ += "userLoginIdentityAddress=" + encodeURIComponent("" + userLoginIdentityAddress) + "&";
         if (password === null)
             throw new Error("The parameter 'password' cannot be null.");
         else if (password !== undefined)
@@ -513,11 +648,11 @@ export class UserServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processValidateUserCredentials(response_);
+            return this.processLogin(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processValidateUserCredentials(response_ as any);
+                    return this.processLogin(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<LoginResultDtoResponseDto>;
                 }
@@ -526,7 +661,7 @@ export class UserServiceProxy {
         }));
     }
 
-    protected processValidateUserCredentials(response: HttpResponseBase): Observable<LoginResultDtoResponseDto> {
+    protected processLogin(response: HttpResponseBase): Observable<LoginResultDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -549,92 +684,31 @@ export class UserServiceProxy {
     }
 
     /**
-     * @param userId (optional) 
-     * @param emailToken (optional) 
+     * @param userName (optional) 
      * @return Success
      */
-    confirmEmail(userId: number | undefined, emailToken: string | undefined): Observable<StringResponseDto> {
-        let url_ = this.baseUrl + "/api/User/ConfirmEmail?";
-        if (userId === null)
-            throw new Error("The parameter 'userId' cannot be null.");
-        else if (userId !== undefined)
-            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
-        if (emailToken === null)
-            throw new Error("The parameter 'emailToken' cannot be null.");
-        else if (emailToken !== undefined)
-            url_ += "emailToken=" + encodeURIComponent("" + emailToken) + "&";
+    getUserByUserLoginIdentity(userName: string | undefined): Observable<UserDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/GetUserByUserLoginIdentity?";
+        if (userName === null)
+            throw new Error("The parameter 'userName' cannot be null.");
+        else if (userName !== undefined)
+            url_ += "userName=" + encodeURIComponent("" + userName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processConfirmEmail(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processConfirmEmail(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<StringResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<StringResponseDto>;
-        }));
-    }
-
-    protected processConfirmEmail(response: HttpResponseBase): Observable<StringResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = StringResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<StringResponseDto>(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    getUserbyUserNameOrEmail(body: UserDto | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/GetUserbyUserNameOrEmail";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "text/plain"
             })
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetUserbyUserNameOrEmail(response_);
+            return this.processGetUserByUserLoginIdentity(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetUserbyUserNameOrEmail(response_ as any);
+                    return this.processGetUserByUserLoginIdentity(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
                 }
@@ -643,7 +717,7 @@ export class UserServiceProxy {
         }));
     }
 
-    protected processGetUserbyUserNameOrEmail(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processGetUserByUserLoginIdentity(response: HttpResponseBase): Observable<UserDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -669,8 +743,8 @@ export class UserServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    forgotPasswordConfrimation(body: UserPasswordDto | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/ForgotPasswordConfrimation";
+    changeUserPassword(body: ChangeUserPasswordDto | undefined): Observable<UserDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/ChangeUserPassword";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -685,12 +759,12 @@ export class UserServiceProxy {
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processForgotPasswordConfrimation(response_);
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processChangeUserPassword(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processForgotPasswordConfrimation(response_ as any);
+                    return this.processChangeUserPassword(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
                 }
@@ -699,7 +773,7 @@ export class UserServiceProxy {
         }));
     }
 
-    protected processForgotPasswordConfrimation(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processChangeUserPassword(response: HttpResponseBase): Observable<UserDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -725,8 +799,8 @@ export class UserServiceProxy {
      * @param emailAdrress (optional) 
      * @return Success
      */
-    resetPassword(emailAdrress: string | undefined): Observable<UserDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/User/ResetPassword?";
+    sendConfirmationEmail(emailAdrress: string | undefined): Observable<BooleanResponseDto> {
+        let url_ = this.baseUrl + "/api/User/SendConfirmationEmail?";
         if (emailAdrress === null)
             throw new Error("The parameter 'emailAdrress' cannot be null.");
         else if (emailAdrress !== undefined)
@@ -742,11 +816,123 @@ export class UserServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processResetPassword(response_);
+            return this.processSendConfirmationEmail(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processResetPassword(response_ as any);
+                    return this.processSendConfirmationEmail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponseDto>;
+        }));
+    }
+
+    protected processSendConfirmationEmail(response: HttpResponseBase): Observable<BooleanResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BooleanResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    verifyConfirmationByEmail(body: VerifyConfirmationByEmailDto | undefined): Observable<BooleanResponseDto> {
+        let url_ = this.baseUrl + "/api/User/VerifyConfirmationByEmail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processVerifyConfirmationByEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processVerifyConfirmationByEmail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponseDto>;
+        }));
+    }
+
+    protected processVerifyConfirmationByEmail(response: HttpResponseBase): Observable<BooleanResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BooleanResponseDto>(null as any);
+    }
+
+    /**
+     * @param emailAdrress (optional) 
+     * @return Success
+     */
+    sendForgotPasswordEmail(emailAdrress: string | undefined): Observable<UserDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/SendForgotPasswordEmail?";
+        if (emailAdrress === null)
+            throw new Error("The parameter 'emailAdrress' cannot be null.");
+        else if (emailAdrress !== undefined)
+            url_ += "emailAdrress=" + encodeURIComponent("" + emailAdrress) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSendForgotPasswordEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSendForgotPasswordEmail(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
                 }
@@ -755,7 +941,63 @@ export class UserServiceProxy {
         }));
     }
 
-    protected processResetPassword(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+    protected processSendForgotPasswordEmail(response: HttpResponseBase): Observable<UserDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UserDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    changeUserPasswordByEmail(body: ChangeUserPasswordByEmailDto | undefined): Observable<UserDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/User/ChangeUserPasswordByEmail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processChangeUserPasswordByEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processChangeUserPasswordByEmail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UserDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UserDtoResponseDto>;
+        }));
+    }
+
+    protected processChangeUserPasswordByEmail(response: HttpResponseBase): Observable<UserDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -831,7 +1073,7 @@ export class UserServiceProxy {
     /**
      * @return Success
      */
-    getById(id: number): Observable<UserDtoResponseDto> {
+    getById(id: string): Observable<UserDtoResponseDto> {
         let url_ = this.baseUrl + "/api/User/GetById/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -941,7 +1183,7 @@ export class UserServiceProxy {
     /**
      * @return Success
      */
-    delete(id: number): Observable<UserDtoResponseDto> {
+    delete(id: string): Observable<UserDtoResponseDto> {
         let url_ = this.baseUrl + "/api/User/Delete/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1054,124 +1296,173 @@ export class UserServiceProxy {
     }
 }
 
-@Injectable()
-export class ServiceProxy {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+export class BooleanResponseDto implements IBooleanResponseDto {
+    isSuccess: boolean;
+    result: boolean;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(USER_API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
-    }
-
-    /**
-     * @return Success
-     */
-    indexGet(id: number): Observable<UserRolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processIndexGet(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processIndexGet(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserRolesDtoResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<UserRolesDtoResponseDto>;
-        }));
-    }
-
-    protected processIndexGet(response: HttpResponseBase): Observable<UserRolesDtoResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserRolesDtoResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
+    constructor(data?: IBooleanResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
         }
-        return _observableOf<UserRolesDtoResponseDto>(null as any);
     }
 
-    /**
-     * @return Success
-     */
-    indexDelete(id: number): Observable<UserRolesDtoResponseDto> {
-        let url_ = this.baseUrl + "/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processIndexDelete(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processIndexDelete(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<UserRolesDtoResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<UserRolesDtoResponseDto>;
-        }));
-    }
-
-    protected processIndexDelete(response: HttpResponseBase): Observable<UserRolesDtoResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = UserRolesDtoResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"];
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
         }
-        return _observableOf<UserRolesDtoResponseDto>(null as any);
     }
+
+    static fromJS(data: any): BooleanResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BooleanResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): BooleanResponseDto {
+        const json = this.toJSON();
+        let result = new BooleanResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBooleanResponseDto {
+    isSuccess: boolean;
+    result: boolean;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class ChangeUserPasswordByEmailDto implements IChangeUserPasswordByEmailDto {
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
+    tacCode: string;
+
+    constructor(data?: IChangeUserPasswordByEmailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.newPassword = _data["newPassword"];
+            this.confirmPassword = _data["confirmPassword"];
+            this.tacCode = _data["tacCode"];
+        }
+    }
+
+    static fromJS(data: any): ChangeUserPasswordByEmailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeUserPasswordByEmailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["newPassword"] = this.newPassword;
+        data["confirmPassword"] = this.confirmPassword;
+        data["tacCode"] = this.tacCode;
+        return data;
+    }
+
+    clone(): ChangeUserPasswordByEmailDto {
+        const json = this.toJSON();
+        let result = new ChangeUserPasswordByEmailDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IChangeUserPasswordByEmailDto {
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
+    tacCode: string;
+}
+
+export class ChangeUserPasswordDto implements IChangeUserPasswordDto {
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
+
+    constructor(data?: IChangeUserPasswordDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.newPassword = _data["newPassword"];
+            this.confirmPassword = _data["confirmPassword"];
+        }
+    }
+
+    static fromJS(data: any): ChangeUserPasswordDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeUserPasswordDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["newPassword"] = this.newPassword;
+        data["confirmPassword"] = this.confirmPassword;
+        return data;
+    }
+
+    clone(): ChangeUserPasswordDto {
+        const json = this.toJSON();
+        let result = new ChangeUserPasswordDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IChangeUserPasswordDto {
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
 }
 
 export class CreateRolesDto implements ICreateRolesDto {
@@ -1399,8 +1690,76 @@ export enum LoginResultType {
     _6 = 6,
 }
 
-export class RolesDto implements IRolesDto {
+export class OtpDto implements IOtpDto {
     id: number;
+    email: string | undefined;
+    tacCode: string | undefined;
+    type: OtpType;
+
+    constructor(data?: IOtpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.email = _data["email"];
+            this.tacCode = _data["tacCode"];
+            this.type = _data["type"];
+        }
+    }
+
+    static fromJS(data: any): OtpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OtpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["email"] = this.email;
+        data["tacCode"] = this.tacCode;
+        data["type"] = this.type;
+        return data;
+    }
+
+    clone(): OtpDto {
+        const json = this.toJSON();
+        let result = new OtpDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IOtpDto {
+    id: number;
+    email: string | undefined;
+    tacCode: string | undefined;
+    type: OtpType;
+}
+
+export enum OtpProtoType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
+export enum OtpType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+}
+
+export class RolesDto implements IRolesDto {
+    id: string;
     name: string | undefined;
     description: string | undefined;
 
@@ -1445,7 +1804,7 @@ export class RolesDto implements IRolesDto {
 }
 
 export interface IRolesDto {
-    id: number;
+    id: string;
     name: string | undefined;
     description: string | undefined;
 }
@@ -1655,85 +2014,24 @@ export interface IRolesDtoResponseDto {
     errorMessages: string[] | undefined;
 }
 
-export class StringResponseDto implements IStringResponseDto {
-    isSuccess: boolean;
-    result: string | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: IStringResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"];
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): StringResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StringResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["result"] = this.result;
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): StringResponseDto {
-        const json = this.toJSON();
-        let result = new StringResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStringResponseDto {
-    isSuccess: boolean;
-    result: string | undefined;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-}
-
 export class UserDto implements IUserDto {
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
     userName: string;
     emailAddress: string;
+    phoneNumber: string | undefined;
     passWord: string;
     passwordSalt: string | undefined;
     kycApprovedDate: DateTime | undefined;
     isKYCApproved: boolean;
     isTwoFactorEnabled: boolean;
-    isLockedOut: boolean;
+    isEmailVerified: boolean;
+    isPhoneVerified: boolean;
     isActive: boolean;
+    isLockedOut: boolean;
     readonly displayName: string | undefined;
     roles: RolesDto[] | undefined;
-    isEmailVerified: boolean;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -1751,20 +2049,22 @@ export class UserDto implements IUserDto {
             this.lastName = _data["lastName"];
             this.userName = _data["userName"];
             this.emailAddress = _data["emailAddress"];
+            this.phoneNumber = _data["phoneNumber"];
             this.passWord = _data["passWord"];
             this.passwordSalt = _data["passwordSalt"];
             this.kycApprovedDate = _data["kycApprovedDate"] ? DateTime.fromISO(_data["kycApprovedDate"].toString()) : <any>undefined;
             this.isKYCApproved = _data["isKYCApproved"];
             this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
-            this.isLockedOut = _data["isLockedOut"];
+            this.isEmailVerified = _data["isEmailVerified"];
+            this.isPhoneVerified = _data["isPhoneVerified"];
             this.isActive = _data["isActive"];
+            this.isLockedOut = _data["isLockedOut"];
             (<any>this).displayName = _data["displayName"];
             if (Array.isArray(_data["roles"])) {
                 this.roles = [] as any;
                 for (let item of _data["roles"])
                     this.roles.push(RolesDto.fromJS(item));
             }
-            this.isEmailVerified = _data["isEmailVerified"];
         }
     }
 
@@ -1782,20 +2082,22 @@ export class UserDto implements IUserDto {
         data["lastName"] = this.lastName;
         data["userName"] = this.userName;
         data["emailAddress"] = this.emailAddress;
+        data["phoneNumber"] = this.phoneNumber;
         data["passWord"] = this.passWord;
         data["passwordSalt"] = this.passwordSalt;
         data["kycApprovedDate"] = this.kycApprovedDate ? this.kycApprovedDate.toString() : <any>undefined;
         data["isKYCApproved"] = this.isKYCApproved;
         data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
-        data["isLockedOut"] = this.isLockedOut;
+        data["isEmailVerified"] = this.isEmailVerified;
+        data["isPhoneVerified"] = this.isPhoneVerified;
         data["isActive"] = this.isActive;
+        data["isLockedOut"] = this.isLockedOut;
         data["displayName"] = this.displayName;
         if (Array.isArray(this.roles)) {
             data["roles"] = [];
             for (let item of this.roles)
                 data["roles"].push(item.toJSON());
         }
-        data["isEmailVerified"] = this.isEmailVerified;
         return data;
     }
 
@@ -1808,21 +2110,23 @@ export class UserDto implements IUserDto {
 }
 
 export interface IUserDto {
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
     userName: string;
     emailAddress: string;
+    phoneNumber: string | undefined;
     passWord: string;
     passwordSalt: string | undefined;
     kycApprovedDate: DateTime | undefined;
     isKYCApproved: boolean;
     isTwoFactorEnabled: boolean;
-    isLockedOut: boolean;
+    isEmailVerified: boolean;
+    isPhoneVerified: boolean;
     isActive: boolean;
+    isLockedOut: boolean;
     displayName: string | undefined;
     roles: RolesDto[] | undefined;
-    isEmailVerified: boolean;
 }
 
 export class UserDtoIEnumerableResponseDto implements IUserDtoIEnumerableResponseDto {
@@ -2030,14 +2334,11 @@ export interface IUserDtoResponseDto {
     errorMessages: string[] | undefined;
 }
 
-export class UserPasswordDto implements IUserPasswordDto {
-    id: number;
-    password: string;
-    confirmPassword: string;
-    emailAddress: string;
-    resetPasswordToken: string;
+export class VerifyConfirmationByEmailDto implements IVerifyConfirmationByEmailDto {
+    email: string;
+    tacCode: string;
 
-    constructor(data?: IUserPasswordDto) {
+    constructor(data?: IVerifyConfirmationByEmailDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2048,159 +2349,36 @@ export class UserPasswordDto implements IUserPasswordDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.password = _data["password"];
-            this.confirmPassword = _data["confirmPassword"];
-            this.emailAddress = _data["emailAddress"];
-            this.resetPasswordToken = _data["resetPasswordToken"];
+            this.email = _data["email"];
+            this.tacCode = _data["tacCode"];
         }
     }
 
-    static fromJS(data: any): UserPasswordDto {
+    static fromJS(data: any): VerifyConfirmationByEmailDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserPasswordDto();
+        let result = new VerifyConfirmationByEmailDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["password"] = this.password;
-        data["confirmPassword"] = this.confirmPassword;
-        data["emailAddress"] = this.emailAddress;
-        data["resetPasswordToken"] = this.resetPasswordToken;
+        data["email"] = this.email;
+        data["tacCode"] = this.tacCode;
         return data;
     }
 
-    clone(): UserPasswordDto {
+    clone(): VerifyConfirmationByEmailDto {
         const json = this.toJSON();
-        let result = new UserPasswordDto();
+        let result = new VerifyConfirmationByEmailDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUserPasswordDto {
-    id: number;
-    password: string;
-    confirmPassword: string;
-    emailAddress: string;
-    resetPasswordToken: string;
-}
-
-export class UserRolesDto implements IUserRolesDto {
-    id: number;
-    userId: number;
-    roleId: number;
-
-    constructor(data?: IUserRolesDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.userId = _data["userId"];
-            this.roleId = _data["roleId"];
-        }
-    }
-
-    static fromJS(data: any): UserRolesDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserRolesDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["userId"] = this.userId;
-        data["roleId"] = this.roleId;
-        return data;
-    }
-
-    clone(): UserRolesDto {
-        const json = this.toJSON();
-        let result = new UserRolesDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUserRolesDto {
-    id: number;
-    userId: number;
-    roleId: number;
-}
-
-export class UserRolesDtoResponseDto implements IUserRolesDtoResponseDto {
-    isSuccess: boolean;
-    result: UserRolesDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
-
-    constructor(data?: IUserRolesDtoResponseDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.result = _data["result"] ? UserRolesDto.fromJS(_data["result"]) : <any>undefined;
-            this.displayMessage = _data["displayMessage"];
-            if (Array.isArray(_data["errorMessages"])) {
-                this.errorMessages = [] as any;
-                for (let item of _data["errorMessages"])
-                    this.errorMessages.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): UserRolesDtoResponseDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserRolesDtoResponseDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        data["displayMessage"] = this.displayMessage;
-        if (Array.isArray(this.errorMessages)) {
-            data["errorMessages"] = [];
-            for (let item of this.errorMessages)
-                data["errorMessages"].push(item);
-        }
-        return data;
-    }
-
-    clone(): UserRolesDtoResponseDto {
-        const json = this.toJSON();
-        let result = new UserRolesDtoResponseDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUserRolesDtoResponseDto {
-    isSuccess: boolean;
-    result: UserRolesDto;
-    displayMessage: string | undefined;
-    errorMessages: string[] | undefined;
+export interface IVerifyConfirmationByEmailDto {
+    email: string;
+    tacCode: string;
 }
 
 export class ApiException extends Error {

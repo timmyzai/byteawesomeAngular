@@ -10,7 +10,7 @@ import { CookiesService } from '../services/cookies.service';
 export class AppAuthService {
   authenticateModel: AuthenticateModel;
   authenticateResult: AuthenticateResultModelResponseDto;
-  rememberMe: boolean;
+  rememberMe: boolean = false;
 
   constructor(
     private _tokenAuthService: AuthenticationServiceProxy,
@@ -46,9 +46,18 @@ export class AppAuthService {
   }
 
   private processAuthenticateResult(authenticateResult: AuthenticateResultModel): void {
-    const require2fa = authenticateResult.require2fa;
+    const requireTwoFactorPin = authenticateResult.requireTwoFactorPin;
     const twoFactorPin = this.authenticateModel.twoFactorPin;
-    if (require2fa && twoFactorPin == null) {
+    const requireEmailTacCode = authenticateResult.requireEmailTacCode;
+    const emailTacCode = this.authenticateModel.emailTacCode;
+    if (requireEmailTacCode && emailTacCode == null) {
+      this._router.navigate(['confirmation-auth-page']);
+      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userLoginIdentity);
+      var expiryDate = new Date(new Date().getTime() + 5 * 365 * 86400000); // 5 year
+      this._cookieService.setCookieValue('UserProfile.UsernameOrEmail', encryptedUsernameOrEmail, expiryDate);
+      return;
+    }
+    if (requireTwoFactorPin && twoFactorPin == null) {
       this._router.navigate(['two-factor-auth-page']);
       return;
     }
@@ -70,7 +79,7 @@ export class AppAuthService {
     accessToken: string,
     encryptedAccessToken: string,
     expireInSeconds: number,
-    userId: number,
+    userId: string,
     rememberMe?: boolean
   ): void {
     const tokenExpireDate = new Date(new Date().getTime() + 1000 * expireInSeconds);
@@ -80,7 +89,7 @@ export class AppAuthService {
     localStorage.setItem('loggedInUserId', userId.toString());
 
     if (rememberMe) {
-      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userNameOrEmailAddress);
+      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userLoginIdentity);
       var expiryDate = new Date(new Date().getTime() + 5 * 365 * 86400000); // 5 year
       this._cookieService.setCookieValue('UserProfile.UsernameOrEmail', encryptedUsernameOrEmail, expiryDate);
     } else {

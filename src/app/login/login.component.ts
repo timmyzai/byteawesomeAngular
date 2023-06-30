@@ -3,7 +3,7 @@ import { AppAuthService } from 'src/shared/auth/app-auth.service';
 import { CookiesService } from 'src/shared/services/cookies.service';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { AuthenticateResultModelResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
+import { AuthenticateModel, AuthenticateResultModelResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
 import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
 
 @Component({
@@ -25,10 +25,11 @@ export class LoginComponent {
   }
 
   getUsernameAndPassword() {
+    this.authService.authenticateModel = new AuthenticateModel();
     var username: string = this._cookieService.getCookieValue('UserProfile.UsernameOrEmail');
 
     if (username) {
-      this.authService.authenticateModel.userNameOrEmailAddress = this._encryptionService.decrypt(username);
+      this.authService.authenticateModel.userLoginIdentity = this._encryptionService.decrypt(username);
     }
 
     if (username) {
