@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <div>
-        <h1>Welcome {{ user?.userName }} to the Home Page!</h1>
+        <h1>Welcome {{ user?.userData.displayName }} to the Home Page!</h1>
         <table>
             <tr>
                 <th>ID</th>
@@ -11,10 +11,10 @@
             </tr>
             <tr>
                 <td id="id">{{ user?.id }}</td>
-                <td id="emailAddress">{{ user?.emailAddress }}</td>
-                <td id="isEmailVerified">{{ user?.isEmailVerified }}</td>
-                <td id="isPhoneVerified">{{ user?.isPhoneVerified }}</td>
-                <td id="isTwoFactorEnabled">{{ user?.isTwoFactorEnabled }}</td>
+                <td id="emailAddress">{{ user?.userData.emailAddress }}</td>
+                <td id="isEmailVerified">{{ user?.userData.isEmailVerified }}</td>
+                <td id="isPhoneVerified">{{ user?.userData.isPhoneVerified }}</td>
+                <td id="isTwoFactorEnabled">{{ user?.userData.isTwoFactorEnabled }}</td>
             </tr>
         </table>
     </div>
@@ -25,10 +25,5 @@
     <div>
         <p>Setup Two Factors Auth</p>
         <button (click)="twoFactorSetup()">Setup 2FA</button>
-    </div>
-
-    <div>
-        <p>Test Two Factors Auth Modal</p>
-        <button (click)="secret()">Open Secret</button>
     </div>
 </div>

@@ -1,218 +1,241 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { UserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
-import { InvestmentDto, TransferDto, UpdateWalletBalanceDto, WalletDto, WalletDtoIEnumerableResponseDto, WalletDtoResponseDto, WalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { EntityUserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
+import { InvestmentDto, TransferDto, WalletServiceProxy, UpdateWalletDto, EntityWalletsDto, SymbolsServiceProxy, EntitySymbolsDto, UpdateWalletBalanceDto } from 'src/shared/service-proxies/wallet-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 import { NotifyServices } from 'src/shared/services/notify.services';
-import { PinInputBoxModalComponent } from '../modals/pin-input-box-modal/pin-input-box-modal.component';
+import { TwoFactorAuthModalComponent } from '../modals/two-factor-auth-modal/two-factor-auth-modal.component';
 
 @Component({
   selector: 'app-wallet',
   templateUrl: './wallet.component.html',
-  styleUrls: ['./wallet.component.css']
+  styleUrls: ['./wallet.component.css'],
 })
 export class WalletComponent implements OnInit {
   walletId: string;
-  wallet: WalletDto;
+  wallet: EntityWalletsDto;
   isPageLoading = true;
-  errorMsg: string = undefined;
-  coin: string;
-  transferAmount: number = 100;
-  transferTarget: WalletDto[];
+  symbolList: EntitySymbolsDto[];
+  investmentAmount = 100;
+  selectedInvestmentSymbol = '';
+  transferAmount = 100;
+  transferTarget: EntityWalletsDto[];
+  selectedTransferSymbol = '';
   selectedTransferTargetWalletId: string;
 
   constructor(
-    private walletServices: WalletServiceProxy,
-    private errorHandler: ApiErrorHandlerService,
+    private walletService: WalletServiceProxy,
+    private symbolService: SymbolsServiceProxy,
+    private responseHandler: ApiResponseHandlerService,
     private _activatedroute: ActivatedRoute,
     private _userService: UserServiceProxy,
-    private _modalService: BsModalService,
+    private modalService: BsModalService,
     private notify: NotifyServices
   ) { }
+
   ngOnInit(): void {
-    this._activatedroute.params.subscribe(params => {
+    this._activatedroute.params.subscribe((params) => {
       this.walletId = params.id;
-      this.getWalletById(this.walletId);
+      this.loadWalletData();
     });
   }
-  private async getWalletById(walletId: string) {
+
+  async loadWalletData(): Promise<void> {
     this.isPageLoading = true;
+    try {
+      const [walletResponse, symbolResponse] = await Promise.all([
+        this.walletService.getWalletById(this.walletId).toPromise(),
+        this.symbolService.getAllSymbols(undefined, undefined).toPromise(),
+      ]);
 
-
-    await this.walletServices.getById(walletId).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          this.wallet = walletDtoResponseDto.result;
-          this.LoadTransferTarget();
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
-    this.isPageLoading = false;
+      this.handleWalletResponse(walletResponse);
+      this.handleSymbolResponse(symbolResponse);
+      this.loadTransferTarget();
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'Failed to fetch data');
+    } finally {
+      this.isPageLoading = false;
+    }
   }
 
-  async disableEnableWallet() {
-    const confirmed = confirm(`Please confirm to ${this.wallet.isActive ? "disable" : "enable"} this wallet?`);
+  handleWalletResponse(walletDtoResponse: any): void {
+    this.responseHandler.handleResponse<EntityWalletsDto>(
+      walletDtoResponse,
+      (data) => {
+        this.wallet = data;
+      },
+      'Fetching wallet data failed'
+    );
+  }
+
+  handleSymbolResponse(symbolResponse: any): void {
+    this.responseHandler.handleResponse<EntitySymbolsDto[]>(
+      symbolResponse,
+      (data) => {
+        this.symbolList = data.filter(x => x.symbolData.network == this.wallet.walletData.network.network);
+      },
+      'Fetching symbols failed'
+    );
+  }
+
+  async loadTransferTarget(): Promise<void> {
+    const network = this.wallet.walletData.network.network;
+    const walletListResponse = await this.walletService.getAdminWalletsByNetwork(network).toPromise();
+    this.handleWalletListResponse(walletListResponse);
+  }
+
+  handleWalletListResponse(walletListResponse: any): void {
+    this.responseHandler.handleResponse<EntityWalletsDto[]>(
+      walletListResponse,
+      (data) => {
+        this.transferTarget = data.filter(x => x.id != this.wallet.id);
+      },
+      'Fetching transfer targets failed'
+    );
+  }
+
+  async disableEnableWallet(): Promise<void> {
+    const action = this.wallet.walletData.isActive ? 'disable' : 'enable';
+    const confirmed = confirm(`Please confirm to ${action} this wallet?`);
     if (confirmed) {
-      this.wallet.isActive = !this.wallet.isActive;
-      await this.updateWallet(this.wallet);;
+      this.wallet.walletData.isActive = !this.wallet.walletData.isActive;
+      await this.updateWallet();
     }
   }
-  async updateBalance(amount: number) {
+
+  async updateBalance(amount: number, symbolId: string) {
     var param = new UpdateWalletBalanceDto();
-    param.id = this.wallet.id
-    param.userId = this.wallet.userId
-    param.walletGroupsId = this.wallet.walletGroupsId
-    param.address = this.wallet.address
-    param.coin = this.wallet.coin
-    param.balance = this.wallet.balance
-    param.isActive = this.wallet.isActive
-    param.isCustoWalletCreated = this.wallet.isCustoWalletCreated
-    param.amount = amount
-
-    await this.walletServices.updateBalance(param).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          this.notify.showSuccess("Update Balance Successful", "Success");
-          this.getWalletById(this.walletId);
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'updateBalance Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "updateBalance Failed");;
-      });
-  }
-
-  async updateWallet(wallet: WalletDto) {
-    await this.walletServices.update(wallet).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          this.notify.showSuccess("Update Successful", "Success");
-          this.getWalletById(this.walletId);
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'updateWallet Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "updateWallet Failed");;
-      });
-  }
-  investment(amount: number): void {
-    const userId = localStorage.getItem('loggedInUserId');
-    this._userService.getById(userId).subscribe(
-      (userResponseDto: UserDtoResponseDto) => {
-        const isTwoFactorEnabled = userResponseDto.result.isTwoFactorEnabled;
-
-        if (!isTwoFactorEnabled) {
-          this.notify.showError("Please enable 2FA to proceed", "Failed");
-        } else {
-          this.showPinInputBoxModal().then((pin: string) => {
-            this.proceedInvestment(amount, pin);
-          });
-        }
-      }
-    );
-  }
-
-  private async proceedInvestment(amount: number, pin: string) {
-    var param = new InvestmentDto();
+    param.walletsId = this.wallet.id;
+    param.symbolsId = symbolId;
     param.amount = amount;
-    param.fromWalletId = this.wallet.id;
-    param.twoFactorPin = pin;
-    await this.walletServices.investment(param).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          this.notify.showSuccess("Investment Successful", "Success");
 
-          this.getWalletById(this.walletId);
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'Investment Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "proceedInvestment Failed");;
-      });
-  }
-  transfer(): void {
-    const userId = localStorage.getItem('loggedInUserId');
-    this._userService.getById(userId).subscribe(
-      (userResponseDto: UserDtoResponseDto) => {
-        const isTwoFactorEnabled = userResponseDto.result.isTwoFactorEnabled;
-
-        if (!isTwoFactorEnabled) {
-          this.notify.showError("Please enable 2FA to proceed", "Failed");
-        } else {
-          this.showPinInputBoxModal().then((pin: string) => {
-            this.proceedTransfer(this.transferAmount, pin);
-          });
-        }
-      }
-    );
-  }
-
-  private async proceedTransfer(amount: number, pin: string) {
-    var param = new TransferDto();
-    param.amount = amount;
-    param.fromWalletId = this.wallet.id;
-    param.twoFactorPin = pin;
-    if (this.selectedTransferTargetWalletId == null) {
-      this.notify.showError("Please select a transfer target", "Failed");
+    try {
+      const walletDtoResponseDto = await this.walletService.updateBalance(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        walletDtoResponseDto,
+        () => {
+          this.notify.showSuccess('Update Balance Successful', 'Success');
+          this.loadWalletData();
+        },
+        'updateBalance Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'updateBalance Failed');
     }
-
-    await this.walletServices.getById(this.selectedTransferTargetWalletId).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          param.toWalletId = walletDtoResponseDto.result.id;
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'Transfer Failed');
-          return;
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "Transfer Failed");;
-      });
-
-    await this.walletServices.transfer(param).toPromise()
-      .then((walletDtoResponseDto: WalletDtoResponseDto) => {
-        if (walletDtoResponseDto.isSuccess) {
-          this.notify.showSuccess("Transfer Successful", "Success");
-          this.getWalletById(this.walletId);
-        } else {
-          this.errorHandler.handleErrorResponse(walletDtoResponseDto, 'Transfer Failed');
-          return;
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "Transfer Failed");;
-      });
   }
 
-  showPinInputBoxModal(): Promise<string> {
-    return new Promise<string>((resolve) => {
-      const modalRef: BsModalRef = this._modalService.show(PinInputBoxModalComponent);
-      modalRef.content.pinInputResult.subscribe((pin: string) => {
-        resolve(pin);
-      });
+  async updateWallet(): Promise<void> {
+    const param = new UpdateWalletDto();
+    param.walletsId = this.wallet.id;
+    param.isActive = this.wallet.walletData.isActive;
+
+    try {
+      const walletDtoResponseDto = await this.walletService.updateWallet(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        walletDtoResponseDto,
+        () => {
+          this.notify.showSuccess('Update Successful', 'Success');
+          this.loadWalletData();
+        },
+        'Update wallet failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'Update wallet failed');
+    }
+  }
+
+  investment(amount: number, symbolId: string): void {
+    this.validateTwoFactorAndProceed(this.proceedInvestment.bind(this), amount, symbolId);
+  }
+
+  transfer(symbolId: string): void {
+    this.validateTwoFactorAndProceed(this.proceedTransfer.bind(this), this.transferAmount, symbolId);
+  }
+
+  private async proceedInvestment(amount: number, symbolId: string, pin: string): Promise<void> {
+    const param = new InvestmentDto();
+    param.symbolsId = symbolId;
+    param.amount = amount;
+    param.fromWalletId = this.wallet.id;
+    param.twoFactorPin = pin;
+
+    try {
+      const walletDtoResponseDto = await this.walletService.investment(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        walletDtoResponseDto,
+        () => {
+          this.notify.showSuccess('Investment Successful', 'Success');
+          this.loadWalletData();
+        },
+        'Investment failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'Transfer Failed');
+    }
+  }
+
+  private async proceedTransfer(amount: number, symbolId: string, pin: string) {
+    try {
+      if (!this.selectedTransferTargetWalletId) {
+        this.notify.showError('Please select a transfer target', 'Failed');
+        return;
+      }
+
+      const targetWallet = await this.getTargetWalletDtoResponse();
+
+      const param = new TransferDto();
+      param.symbolsId = symbolId;
+      param.toWalletAddress = targetWallet.walletData.address;
+      param.amount = amount;
+      param.fromWalletId = this.wallet.id;
+      param.twoFactorPin = pin;
+      const transferResponse = await this.walletService.transfer(param).toPromise();
+
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        transferResponse,
+        () => {
+          this.notify.showSuccess('Transfer Successful', 'Success');
+          this.loadWalletData();
+        },
+        'Transfer failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'Transfer Failed');
+    }
+  }
+
+  private async getTargetWalletDtoResponse(): Promise<EntityWalletsDto> {
+    const targetWalletDtoResponse = await this.walletService.getWalletById(this.selectedTransferTargetWalletId).toPromise();
+
+    return new Promise<EntityWalletsDto>((resolve) => {
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        targetWalletDtoResponse,
+        (data: EntityWalletsDto) => {
+          resolve(data);
+        },
+        'getWalletById failed'
+      );
     });
   }
 
-  async LoadTransferTarget() {
-    await this.walletServices.getAdminWalletsForCoinId(this.wallet.coin.id).toPromise()
-      .then((walletListResponseDto: WalletDtoIEnumerableResponseDto) => {
-        if (walletListResponseDto.isSuccess) {
-          this.transferTarget = walletListResponseDto.result;
+  private async validateTwoFactorAndProceed(callback: (amount: number, symbolId: string, pin: string) => void, amount: number, symbolId: string): Promise<void> {
+    const userId = localStorage.getItem('loggedInUserId');
+    this._userService.getUserById(userId).subscribe(
+      async (userResponseDto: EntityUserDtoResponseDto) => {
+        const isTwoFactorEnabled = userResponseDto.result.userData.isTwoFactorEnabled;
+        if (!isTwoFactorEnabled) {
+          this.notify.showError('Please enable 2FA to proceed', 'Failed');
         } else {
-          this.errorHandler.handleErrorResponse(walletListResponseDto, 'getAdminWalletGroup Failed');
-          return;
+          const modalRef = this.modalService.show(TwoFactorAuthModalComponent);
+
+          modalRef.content.twoFactorPinResult.subscribe(async (twoFactorPin: string) => {
+            if (twoFactorPin && twoFactorPin.length === 6) {
+              callback(amount, symbolId, twoFactorPin);
+            }
+          });
         }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getAdminWalletGroup Failed");;
-      });
+      }
+    );
   }
 }

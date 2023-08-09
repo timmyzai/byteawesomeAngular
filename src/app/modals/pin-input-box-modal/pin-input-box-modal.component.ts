@@ -40,8 +40,8 @@ export class PinInputBoxModalComponent {
   }
 
   submit() {
-    const twoFactorPin = this.otpBoxes.join('');
-    this.pinInputResult.emit(twoFactorPin);
+    const pin = this.otpBoxes.join('');
+    this.pinInputResult.emit(pin);
     this._bsModalRef.hide();
   }
 }

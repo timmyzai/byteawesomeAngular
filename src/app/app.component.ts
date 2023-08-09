@@ -21,10 +21,9 @@ export class AppComponent implements OnInit {
   }
 
   checkUserLogin() {
-    const accessToken = this._cookieService.getCookieValue('accessToken');
     const encryptedAccessToken = this._cookieService.getCookieValue(AppConsts.authorization.encryptedAuthTokenName);
 
-    if (accessToken && encryptedAccessToken) {
+    if (encryptedAccessToken) {
       this.isLoggedIn = true;
       if (window.location.href.includes("login")) {
         this.route.navigate(["home"]);

@@ -4,26 +4,25 @@ import { NotifyServices } from './notify.services';
 @Injectable({
   providedIn: 'root'
 })
-export class ApiErrorHandlerService {
+export class ApiResponseHandlerService {
 
-  constructor(private notify: NotifyServices) {}
+  constructor(private notify: NotifyServices) { }
 
-  handleErrorResponse(responseDto: any, errorMessageTitle: string) {
-    if (!responseDto.isSuccess) {
-      const errorMessages = responseDto.errorMessages;
-      if (errorMessages && errorMessages.length > 0) {
-        this.notify.showError(errorMessages.join(', '), errorMessageTitle);
-      } else {
-        this.notify.showError('No error message', errorMessageTitle);
-      }
+  async handleResponse<T>(response: any, successCallback: (data: T) => void, errorTitle: string) {
+    if (response.isSuccess) {
+      successCallback(response.result);
+    } else {
+      this.handleErrorResponse(response.errorMessages, errorTitle);
     }
   }
 
-  handleCommonApiErrorReponse(error: any, message: string): void {
-    if (error.response) {
-      this.notify.showError(error.response, message);
-    } else {
-      this.notify.showError(error, message);
-    }
+  handleErrorResponse(errorMessages: string[], errorTitle: string) {
+    const errorMessage = errorMessages && errorMessages.length > 0 ? errorMessages.join(', ') : 'No error message';
+    this.notify.showError(errorMessage, errorTitle);
+  }
+
+  handleCommonApiErrorResponse(error: any, message: string): void {
+    const errorMessage = error.response || error;
+    this.notify.showError(errorMessage, message);
   }
 }

@@ -6,35 +6,35 @@
           <div class="form-group mt-3">
             <div class="input-group">
               <input type="text" class="form-control" name="firstName" 
-                [(ngModel)]="CreateUserDto.firstName" [placeholder]="'First Name'"
+                [(ngModel)]="RegisterDto.firstName" [placeholder]="'First Name'"
                 required maxlength="256" #firstNameModel="ngModel" #usernameEl />
             </div>
           </div>
           <div class="form-group mt-3">
             <div class="input-group">
               <input type="text" class="form-control" name="lastname"
-                [(ngModel)]="CreateUserDto.lastName" [placeholder]="'Last Name'"
+                [(ngModel)]="RegisterDto.lastName" [placeholder]="'Last Name'"
                 required maxlength="256" #lastNameModel="ngModel" #emailEl />
             </div>
           </div>
           <div class="form-group mt-3">
             <div class="input-group">
               <input type="text" class="form-control" name="UserName"
-                [(ngModel)]="CreateUserDto.userName" [placeholder]="'UserName'" required maxlength="32"
+                [(ngModel)]="RegisterDto.userName" [placeholder]="'UserName'" required maxlength="32"
                 #userNameModel="ngModel"  />
             </div>
           </div>
           <div class="form-group mt-3">
             <div class="input-group">
               <input type="email" class="form-control" name="emailAddress"
-                [(ngModel)]="CreateUserDto.emailAddress" [placeholder]="'Email Address'"
+                [(ngModel)]="RegisterDto.emailAddress" [placeholder]="'Email Address'"
                 required maxlength="32" #emailAddressModel="ngModel" />
             </div>
           </div>
           <div class="form-group mt-3">
             <div class="input-group">
               <input type="password" class="form-control" name="password"
-                [(ngModel)]="CreateUserDto.passWord" [placeholder]="'Password'" required maxlength="32"
+                [(ngModel)]="RegisterDto.passWord" [placeholder]="'Password'" required maxlength="32"
                 #PasswordModel="ngModel"  />
             </div>
           </div>

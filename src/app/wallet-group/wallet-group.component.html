@@ -8,40 +8,30 @@
         <th>TagName</th>
         <th>Active</th>
         <th>IsMain</th>
-        <th>IsCustoWGCreated</th>
-        <th>CustoWG Id</th>
-        <th>CustoWG Name</th>
         <th>Wallets</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let walletGroup of walletGroups">
         <td>{{ walletGroup.id }}</td>
-        <td>{{ walletGroup.userId }}</td>
-        <td>{{ walletGroup.tagName }}</td>
-        <td><button (click)="confirmUpdate(walletGroup.id)">{{ walletGroup.isActive }}</button></td>
-        <td>{{ walletGroup.isMain }}</td>
-        <td>{{ walletGroup.isCustoWalletGroupCreated }}</td>
+        <td>{{ walletGroup.walletGroupData.userId }}</td>
+        <td>{{ walletGroup.walletGroupData.tagName }}</td>
+        <td><button (click)="confirmUpdate(walletGroup.id)">{{ walletGroup.walletGroupData.isActive }}</button></td>
+        <td>{{ walletGroup.walletGroupData.isMain }}</td>
         <td>
-          {{ walletGroup.custoWalletGroupId }}
-          <button *ngIf="walletGroup.custoWalletGroupId === null"
-            (click)="createCustoWalletGroup(walletGroup.id)">Create</button>
-        </td>
-        <td>{{ walletGroup.custoWalletGroupName }}</td>
-        <td>
-          <div class="dropdown" *ngIf="walletGroup.wallets && walletGroup.wallets.length > 0; else noWallet">
+          <div class="dropdown" *ngIf="walletGroup.walletGroupData.wallets && walletGroup.walletGroupData.wallets.length > 0; else noWallet">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="walletsDropdown"
               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Wallets ({{ walletGroup.wallets.length }})
+              Wallets ({{ walletGroup.walletGroupData.wallets.length }})
             </button>
             <div class="dropdown-menu" aria-labelledby="walletsDropdown">
-              <ng-container *ngFor="let wallet of walletGroup.wallets">
+              <ng-container *ngFor="let wallet of walletGroup.walletGroupData.wallets">
                 <a class="dropdown-item" (click)="navigateToWallet(wallet.id)">
                   <div class="d-flex flex-column">
                     <span class="fw-bold">ID: {{ wallet.id }}</span>
                   </div>
                   <div class="d-flex flex-column">
-                    <span class="fw-bold">Address: {{ wallet.address }}</span>
+                    <span class="fw-bold">Address: {{ wallet.walletData.address }}</span>
                   </div>
                 </a>
               </ng-container>
@@ -74,8 +64,8 @@
     <br>
     <label>
       Coin:
-      <select name="selectedCoinId" [(ngModel)]="selectedCoinId" required>
-        <option *ngFor="let coin of coinList" [value]="coin.id">{{ coin.fSymbol }} ({{ coin.fNetwork }})
+      <select name="selectedNetworkId" [(ngModel)]="selectedNetworkId" required>
+        <option *ngFor="let network of networkList" [value]="network.id">{{ network.network }} ({{ network.networkName }})
         </option>
       </select>
     </label>

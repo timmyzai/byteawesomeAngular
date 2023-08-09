@@ -1,6 +1,6 @@
 import { Component, EventEmitter, } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { TwoFactorAuthServiceProxy } from 'src/shared/service-proxies/auth-service-proxies';
+import { UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
 @Component({
   selector: 'app-two-factor-auth-modal',
   templateUrl: './two-factor-auth-modal.component.html',
@@ -12,16 +12,18 @@ export class TwoFactorAuthModalComponent {
   otpBoxes: string[] = Array(this.otpLength).fill('');
   isValidInput: Boolean = false;
   isInvalidPin: Boolean = false;
-  validateTwoFactorResult: EventEmitter<boolean> = new EventEmitter<boolean>();
+  twoFactorPinResult: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(
     public _bsModalRef: BsModalRef,
-    private _twoFactorAuthService: TwoFactorAuthServiceProxy,
   ) {
+    this._bsModalRef.onHidden.subscribe(() => {
+      this.hideModal();
+    });
   }
 
   hideModal() {
-    this.validateTwoFactorResult.emit(false); 
+    this.twoFactorPinResult.emit(null);
     this._bsModalRef.hide();
   }
 
@@ -37,21 +39,12 @@ export class TwoFactorAuthModalComponent {
       this.otpBoxes[i] = otp[i];
     }
     this.isInvalidPin = false;
-    this.isValidInput= otp.length === this.otpLength;
+    this.isValidInput = otp.length === this.otpLength;
   }
 
   submit() {
-      const userId = localStorage.getItem('loggedInUserId');
     const twoFactorPin = this.otpBoxes.join('');
-    this._twoFactorAuthService.validateTwoFactorPIN(userId, twoFactorPin).subscribe(
-      (boolResponseDto) => {
-        if (boolResponseDto.result) {
-          this.validateTwoFactorResult.emit(boolResponseDto.result);
-          this.hideModal();
-        } else {
-          this.isInvalidPin = true;
-        }
-      }
-    )
+    this.twoFactorPinResult.emit(twoFactorPin);
+    this._bsModalRef.hide();
   }
 }

@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from 'src/shared/AppConsts';
-import { AuthenticateModel, AuthenticateResultModel, AuthenticateResultModelResponseDto, AuthenticationServiceProxy, } from 'src/shared/service-proxies/auth-service-proxies';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { CookiesService } from '../services/cookies.service';
+import { LoginDto, LoginResultDto, LoginResultDtoResponseDto, LoginResultType, UserServiceProxy } from '../service-proxies/user-service-proxies';
 
 @Injectable()
-export class AppAuthService {
-  authenticateModel: AuthenticateModel;
-  authenticateResult: AuthenticateResultModelResponseDto;
+export class AppappAuthService {
+  LoginDto: LoginDto;
+  loginResult: LoginResultDtoResponseDto;
   rememberMe: boolean = false;
 
   constructor(
-    private _tokenAuthService: AuthenticationServiceProxy,
+    private _userService: UserServiceProxy,
     private _router: Router,
     private _encryptionService: EncryptionService,
     private _cookieService: CookiesService,
@@ -31,52 +31,44 @@ export class AppAuthService {
     }
   }
 
-  authenticate(callback: (result: AuthenticateResultModelResponseDto) => void) {
-    this._tokenAuthService.authenticate(this.authenticateModel)
+  authenticate(callback: (result: LoginResultDtoResponseDto) => void) {
+    this._userService.login(this.LoginDto)
       .pipe(
         finalize(() => {
-          callback(this.authenticateResult);
+          callback(this.loginResult);
         })
-      ).subscribe((result: AuthenticateResultModelResponseDto) => {
-        this.authenticateResult = result;
-        if (result.isSuccess) {
-          this.processAuthenticateResult(result.result);
-        }
+      ).subscribe((result: LoginResultDtoResponseDto) => {
+        this.loginResult = result;
+        this.processAuthenticateResult(result.result);
       });
   }
 
-  private processAuthenticateResult(authenticateResult: AuthenticateResultModel): void {
-    const requireTwoFactorPin = authenticateResult.requireTwoFactorPin;
-    const twoFactorPin = this.authenticateModel.twoFactorPin;
-    const requireEmailTacCode = authenticateResult.requireEmailTacCode;
-    const emailTacCode = this.authenticateModel.emailTacCode;
-    if (requireEmailTacCode && emailTacCode == null) {
+  private processAuthenticateResult(loginResult: LoginResultDto): void {
+    const loginResultType = loginResult.loginResult;
+
+    if (loginResultType == LoginResultType.RequireOtpToVerifyEmail) {
       this._router.navigate(['confirmation-auth-page']);
-      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userLoginIdentity);
+      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.LoginDto.userLoginIdentityAddress);
       var expiryDate = new Date(new Date().getTime() + 5 * 365 * 86400000); // 5 year
       this._cookieService.setCookieValue('UserProfile.UsernameOrEmail', encryptedUsernameOrEmail, expiryDate);
       return;
     }
-    if (requireTwoFactorPin && twoFactorPin == null) {
+    if (loginResultType == LoginResultType.RequireTwoFactorPin) {
       this._router.navigate(['two-factor-auth-page']);
       return;
     }
 
-    const accessToken = authenticateResult.accessToken;
-    const encryptedAccessToken = authenticateResult.encryptedAccessToken;
-    const expireInSeconds = authenticateResult.expireInSeconds;
-    const userId = authenticateResult.userId;
+    const encryptedAccessToken = loginResult.encryptedAccessToken;
+    const expireInSeconds = loginResult.expireInSeconds;
+    const userId = loginResult.userId;
 
-    if (accessToken) {
-      this.login(accessToken, encryptedAccessToken, expireInSeconds, userId, this.rememberMe);
-    } else {
-      console.error('Unexpected authenticateResult!');
-      this._router.navigate(['login']);
+    if (loginResultType == LoginResultType.Success) {
+      this.login(encryptedAccessToken, expireInSeconds, userId, this.rememberMe);
+      return;
     }
   }
 
   private login(
-    accessToken: string,
     encryptedAccessToken: string,
     expireInSeconds: number,
     userId: string,
@@ -84,12 +76,11 @@ export class AppAuthService {
   ): void {
     const tokenExpireDate = new Date(new Date().getTime() + 1000 * expireInSeconds);
 
-    this._cookieService.setCookieValue("accessToken", accessToken, tokenExpireDate);
     this._cookieService.setCookieValue(AppConsts.authorization.encryptedAuthTokenName, encryptedAccessToken, tokenExpireDate);
     localStorage.setItem('loggedInUserId', userId.toString());
 
     if (rememberMe) {
-      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.authenticateModel.userLoginIdentity);
+      var encryptedUsernameOrEmail = this._encryptionService.encrypt(this.LoginDto.userLoginIdentityAddress);
       var expiryDate = new Date(new Date().getTime() + 5 * 365 * 86400000); // 5 year
       this._cookieService.setCookieValue('UserProfile.UsernameOrEmail', encryptedUsernameOrEmail, expiryDate);
     } else {
@@ -100,9 +91,8 @@ export class AppAuthService {
   }
 
   private clear(): void {
-    this.authenticateModel = new AuthenticateModel();
-    this.authenticateModel.rememberClient = false;
-    this.authenticateResult = null;
+    this.LoginDto = new LoginDto();
+    this.loginResult = null;
     this.rememberMe = false;
   }
 }

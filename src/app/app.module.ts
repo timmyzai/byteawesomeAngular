@@ -5,19 +5,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule } from '@angular/forms';
-import { AppAuthService } from 'src/shared/auth/app-auth.service';
+import { AppappAuthService } from 'src/shared/auth/app-auth.service';
 import { ServiceProxyModule } from 'src/shared/service-proxies/service-proxy.module';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppInitializer } from 'src/app-initializer';
 import { AppConsts } from 'src/shared/AppConsts';
-import { AUTH_API_BASE_URL } from 'src/shared/service-proxies/auth-service-proxies';
 import { USER_API_BASE_URL } from 'src/shared/service-proxies/user-service-proxies';
 import { WALLET_API_BASE_URL } from 'src/shared/service-proxies/wallet-service-proxies';
 import { HomeComponent } from './home/home.component';
 import { TwoFactorAuthModalComponent } from './modals/two-factor-auth-modal/two-factor-auth-modal.component';
 
-import { SecretPlaceComponent } from './secret-place/secret-place.component';
 import { TwoFactorAuthSetupComponent } from './two-factor-auth/two-factor-auth-setup/two-factor-auth-setup.component';
 
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal';
@@ -38,7 +36,6 @@ import { PinInputBoxModalComponent } from './modals/pin-input-box-modal/pin-inpu
     HomeComponent,
     TwoFactorAuthModalComponent,
     PinInputBoxModalComponent,
-    SecretPlaceComponent,
     TwoFactorAuthSetupComponent,
     TwoFactorAuthPageComponent,
     WalletGroupComponent,
@@ -60,14 +57,13 @@ import { PinInputBoxModalComponent } from './modals/pin-input-box-modal/pin-inpu
     })
   ],
   providers: [
-    AppAuthService,
+    AppappAuthService,
     {
       provide: APP_INITIALIZER,
       useFactory: (appInitializer: AppInitializer) => appInitializer.init(),
       deps: [AppInitializer],
       multi: true,
     },
-    { provide: AUTH_API_BASE_URL, useFactory: () => AppConsts.remoteAuthServiceBaseUrl },
     { provide: USER_API_BASE_URL, useFactory: () => AppConsts.remoteUserServiceBaseUrl },
     { provide: WALLET_API_BASE_URL, useFactory: () => AppConsts.remoteWalletServiceBaseUrl },
     BsModalService

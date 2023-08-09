@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { UserServiceProxy, CreateUserDto, UserDtoResponseDto } from 'src/shared/service-proxies/user-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { UserServiceProxy, RegisterDto, EntityUserDtoResponseDto, EntityUserDto } from 'src/shared/service-proxies/user-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 import { NotifyServices } from 'src/shared/services/notify.services';
 
 @Component({
@@ -11,11 +11,11 @@ import { NotifyServices } from 'src/shared/services/notify.services';
 })
 export class RegistrationComponent {
   submitting: boolean = false;
-  CreateUserDto: CreateUserDto = new CreateUserDto();
+  RegisterDto: RegisterDto = new RegisterDto();
   loading: boolean = false;
   constructor(
     private userService: UserServiceProxy,
-    private errorHandler: ApiErrorHandlerService,
+    private responseHandler: ApiResponseHandlerService,
     private route: Router,
     private notify: NotifyServices
   ) {
@@ -26,19 +26,19 @@ export class RegistrationComponent {
     try {
       this.submitting = true;
 
-      await this.userService.register(this.CreateUserDto).toPromise()
-        .then((userResponseDto: UserDtoResponseDto) => {
+      await this.userService.register(this.RegisterDto).toPromise()
+        .then((userResponseDto: EntityUserDtoResponseDto) => {
           if (userResponseDto.isSuccess) {
             this.notify.showSuccess("Successfully registered.", "Success");
             setTimeout(() => {
               this.route.navigate(["login"]);
             }, 2000);
           } else {
-            this.errorHandler.handleErrorResponse(userResponseDto, 'Registration Failed');
+            this.responseHandler.handleResponse<EntityUserDto>(userResponseDto, null, 'Registration Failed');
           }
         })
         .catch((error: any) => {
-          this.errorHandler.handleCommonApiErrorReponse(error, "Registration Failed");;
+          this.responseHandler.handleCommonApiErrorResponse(error, "Registration Failed");;
         });
     } finally {
       this.submitting = false;

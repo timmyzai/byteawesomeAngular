@@ -1,9 +1,9 @@
 import { Component, OnInit, } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { AppAuthService } from 'src/shared/auth/app-auth.service';
-import { ChangeUserPasswordByEmailDto, UserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { AppappAuthService } from 'src/shared/auth/app-auth.service';
+import { ChangeUserPasswordByEmailDto, EntityUserDto, EntityUserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 import { NotifyServices } from 'src/shared/services/notify.services';
 
 @Component({
@@ -31,8 +31,8 @@ export class ForgotpasswordComponent implements OnInit {
 
   constructor(
     private route: Router,
-    public authService: AppAuthService,
-    private errorHandler: ApiErrorHandlerService,
+    public appAuthService: AppappAuthService,
+    private responseHandler: ApiResponseHandlerService,
     private userService: UserServiceProxy,
     private notify: NotifyServices,
   ) {
@@ -83,18 +83,18 @@ export class ForgotpasswordComponent implements OnInit {
       param.email = this.email;
 
       await this.userService.changeUserPasswordByEmail(param).toPromise()
-        .then((userResponseDto: UserDtoResponseDto) => {
+        .then((userResponseDto: EntityUserDtoResponseDto) => {
           if (userResponseDto.isSuccess) {
             this.notify.showSuccess("Password changed successfully", "Success");
             setTimeout(() => {
               this.route.navigate(["login"]);
             }, 2000);
           } else {
-            this.errorHandler.handleErrorResponse(userResponseDto, 'changeUserPasswordByEmail Failed');
+            this.responseHandler.handleResponse<EntityUserDto>(userResponseDto, null, 'changeUserPasswordByEmail Failed');
           }
         })
         .catch((error: any) => {
-          this.errorHandler.handleCommonApiErrorReponse(error, "changeUserPasswordByEmail Failed");;
+          this.responseHandler.handleCommonApiErrorResponse(error, "changeUserPasswordByEmail Failed");;
         });
     } finally {
       this.submitting = false;
@@ -125,7 +125,7 @@ export class ForgotpasswordComponent implements OnInit {
         } else {
           clearInterval(countdownInterval);
           this.isResendClicked = false;
-          this.errorHandler.handleErrorResponse(response, 'sendForgotPasswordEmail failed');
+          this.responseHandler.handleResponse<boolean>(response, null, 'sendForgotPasswordEmail Failed');
         }
       },
       error => {

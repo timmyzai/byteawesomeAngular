@@ -1,0 +1,54 @@
+.wallet-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.wallet-details {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+}
+
+.wallet-info {
+    margin-bottom: 15px;
+}
+
+.asset-details {
+    margin-top: 15px;
+}
+
+.investment-section,
+.transfer-section {
+    flex: 1;
+    padding: 20px;
+    margin-left: 20px;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin: 5px 0;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+/* Style your investment and transfer forms here */

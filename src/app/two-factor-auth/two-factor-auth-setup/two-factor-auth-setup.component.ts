@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { TwoFactorAuthServiceProxy, TwoFactorAuthDto, TwoFactorAuthDtoResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
-import { UserDto, UserDtoResponseDto, UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
+import { GetTwoFactorAuthInfoResult, GetTwoFactorAuthInfoResultResponseDto, EntityUserDto, EntityUserDtoResponseDto, UserServiceProxy, EnableOrDisableTwoFactorAuthDto } from 'src/shared/service-proxies/user-service-proxies';
 import { TwoFactorAuthModalComponent } from '../../modals/two-factor-auth-modal/two-factor-auth-modal.component';
 import { NotifyServices } from 'src/shared/services/notify.services';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 
 @Component({
   selector: 'app-two-factor-auth-setup',
@@ -14,19 +13,18 @@ import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.serv
   animations: [accountModuleAnimation()]
 })
 export class TwoFactorAuthSetupComponent implements OnInit {
-  authDetails: TwoFactorAuthDto = new TwoFactorAuthDto();
-  user: UserDto;
+  authDetails: GetTwoFactorAuthInfoResult = new GetTwoFactorAuthInfoResult();
+  user: EntityUserDto;
   serial = '';
   isToggled = false;
   isPageLoading = true;
   errorMsg: string = undefined;
 
   constructor(
-    private twoFactorAuthService: TwoFactorAuthServiceProxy,
-    private userServices: UserServiceProxy,
+    private userService: UserServiceProxy,
     private modalService: BsModalService,
     private notify: NotifyServices,
-    private errorHandler: ApiErrorHandlerService,
+    private responseHandler: ApiResponseHandlerService,
   ) { }
 
   ngOnInit(): void {
@@ -37,20 +35,17 @@ export class TwoFactorAuthSetupComponent implements OnInit {
     try {
       this.isPageLoading = true;
       const userId = localStorage.getItem('loggedInUserId');
+      const userResponseDto = await this.userService.getUserById(userId).toPromise();
 
-      await this.userServices.getById(userId).toPromise()
-        .then((userResponseDto: UserDtoResponseDto) => {
-          if (userResponseDto.isSuccess) {
-            this.user = userResponseDto.result;
-            this.isToggled = this.user.isTwoFactorEnabled;
-          } else {
-            this.errorHandler.handleErrorResponse(userResponseDto, 'getWalletById Failed');
-          }
-        })
-        .catch((error: any) => {
-          this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-        });
-      await this.createOrUpdateTwoFactorAuth(this.user);
+      if (userResponseDto.isSuccess) {
+        this.user = userResponseDto.result;
+        this.isToggled = this.user.userData.isTwoFactorEnabled;
+        await this.createOrUpdateTwoFactorAuth(this.user);
+      } else {
+        this.responseHandler.handleResponse<EntityUserDto>(userResponseDto, null, 'getUserById Failed');
+      }
+    } catch (error: any) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'getUserById Failed');
     } finally {
       this.isPageLoading = false;
     }
@@ -60,55 +55,61 @@ export class TwoFactorAuthSetupComponent implements OnInit {
     try {
       this.isPageLoading = true;
       this.isToggled = !this.isToggled;
+
       if (this.errorMsg) {
         this.notify.showError(`${this.errorMsg}`, 'Generate 2FA Error', 5);
         return;
       }
-      this.showTwoFactorAuthModal();
+
+      this.showTwoFactorAuthModal(this.isToggled);
     } finally {
       this.isPageLoading = false;
     }
   }
 
-  showTwoFactorAuthModal(): void {
-    const modalRef: BsModalRef = this.modalService.show(TwoFactorAuthModalComponent);
-    modalRef.content.validateTwoFactorResult.subscribe(async (bool: boolean) => {
-      if (bool) {
-        this.user.isTwoFactorEnabled = this.isToggled;
+  async showTwoFactorAuthModal(bool: boolean): Promise<void> {
+    const modalRef = this.modalService.show(TwoFactorAuthModalComponent);
 
-        await this.userServices.update(this.user).toPromise()
-          .then((userResponseDto: UserDtoResponseDto) => {
-            if (userResponseDto.isSuccess) {
-              this.user = userResponseDto.result;
-            } else {
-              this.errorHandler.handleErrorResponse(userResponseDto, 'getWalletById Failed');
-            }
-          })
-          .catch((error: any) => {
-            this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-          });
-        await this.createOrUpdateTwoFactorAuth(this.user);
-      } else {
-        this.isToggled = this.user.isTwoFactorEnabled;
+    modalRef.content.twoFactorPinResult.subscribe(async (twoFactorPin: string) => {
+      if (twoFactorPin && twoFactorPin.length === 6) {
+        await this.enableOrDisableTwoFactorAuth(bool, twoFactorPin);
+        this.isToggled = this.user.userData.isTwoFactorEnabled;
       }
     });
   }
 
-  private async createOrUpdateTwoFactorAuth(user: UserDto): Promise<void> {
-    await this.twoFactorAuthService.createOrUpdateTwoFactorAuth().toPromise()
-      .then((twoFactorResposneDto: TwoFactorAuthDtoResponseDto) => {
-        if (twoFactorResposneDto.isSuccess) {
-          this.authDetails = twoFactorResposneDto.result;
-          this.serial = this.authDetails.twoFactorSecretKey.match(/.{4}/g).join('-');
-          if (this.isPageLoading == false) {
-            this.notify.showSuccess(`You have ${user.isTwoFactorEnabled ? 'activated' : 'deactivated'} 2FA`, 'Success', 5);
-          }
-        } else {
-          this.errorHandler.handleErrorResponse(twoFactorResposneDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
+  private async enableOrDisableTwoFactorAuth(bool: boolean, twoFactorPin: string) {
+    const param = new EnableOrDisableTwoFactorAuthDto();
+    param.twoFactorPin = twoFactorPin;
+    param.userId = this.user.id;
+    param.enable = bool;
+
+    try {
+      const userResponseDto = await this.userService.enableOrDisableTwoFactorAuth(param).toPromise();
+      this.user = userResponseDto.isSuccess ? userResponseDto.result : this.user;
+    } catch (error: any) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'enableOrDisableTwoFactorAuth Failed');
+    }
   }
+
+
+  private async createOrUpdateTwoFactorAuth(user: EntityUserDto): Promise<void> {
+    try {
+      const twoFactorResponseDto = await this.userService.getTwoFactorAuthInfo(user.id).toPromise();
+
+      if (twoFactorResponseDto.isSuccess) {
+        this.authDetails = twoFactorResponseDto.result;
+        this.serial = this.authDetails.twoFactorSecretKey.match(/.{4}/g).join('-');
+
+        if (!this.isPageLoading) {
+          this.notify.showSuccess(`You have ${user.userData.isTwoFactorEnabled ? 'activated' : 'deactivated'} 2FA`, 'Success', 5);
+        }
+      } else {
+        this.responseHandler.handleResponse<GetTwoFactorAuthInfoResult>(twoFactorResponseDto, null, 'getTwoFactorAuthInfo Failed');
+      }
+    } catch (error: any) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'getTwoFactorAuthInfo Failed');
+    }
+  }
+
 }

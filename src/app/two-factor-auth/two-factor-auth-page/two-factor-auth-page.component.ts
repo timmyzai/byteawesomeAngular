@@ -1,16 +1,15 @@
 import { Component, } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { AppAuthService } from 'src/shared/auth/app-auth.service';
-import { AuthenticateResultModelResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { AppappAuthService } from 'src/shared/auth/app-auth.service';
+import { LoginResultDto, LoginResultDtoResponseDto } from 'src/shared/service-proxies/user-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 
 @Component({
   selector: 'app-two-factor-auth-page',
   templateUrl: './two-factor-auth-page.component.html',
   styleUrls: ['./two-factor-auth-page.component.css'],
   animations: [accountModuleAnimation()]
-
 })
 
 export class TwoFactorAuthPageComponent {
@@ -23,8 +22,8 @@ export class TwoFactorAuthPageComponent {
 
   constructor(
     private route: Router,
-    public authService: AppAuthService,
-    private errorHandler: ApiErrorHandlerService,
+    public appAuthService: AppappAuthService,
+    private responseHandler: ApiResponseHandlerService,
   ) {
   }
 
@@ -46,9 +45,9 @@ export class TwoFactorAuthPageComponent {
   submit() {
     this.submitting = true;
     const twoFactorPin = this.otpBoxes.join('');
-    this.authService.authenticateModel.twoFactorPin = twoFactorPin;
-    this.authService.authenticate((authenticateResult: AuthenticateResultModelResponseDto) => {
-      this.errorHandler.handleErrorResponse(authenticateResult, 'Login Failed');
+    this.appAuthService.LoginDto.twoFactorPin = twoFactorPin;
+    this.appAuthService.authenticate((loginResult: LoginResultDtoResponseDto) => {
+      this.responseHandler.handleResponse<LoginResultDto>(loginResult, null, 'authenticate Failed');
       this.submitting = false;
     });
   }

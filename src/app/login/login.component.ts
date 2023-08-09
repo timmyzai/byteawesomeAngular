@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { AppAuthService } from 'src/shared/auth/app-auth.service';
+import { AppappAuthService } from 'src/shared/auth/app-auth.service';
 import { CookiesService } from 'src/shared/services/cookies.service';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { AuthenticateModel, AuthenticateResultModelResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { LoginDto, LoginResultDto, LoginResultDtoResponseDto } from 'src/shared/service-proxies/user-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 
 @Component({
   templateUrl: './login.component.html',
@@ -12,10 +12,10 @@ import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.serv
 })
 export class LoginComponent {
   constructor(
-    public authService: AppAuthService,
+    public appAuthService: AppappAuthService,
     private _encryptionService: EncryptionService,
     private _cookieService: CookiesService,
-    private errorHandler: ApiErrorHandlerService,
+    private responseHandler: ApiResponseHandlerService,
   ) {
   }
   submitting = false;
@@ -25,23 +25,22 @@ export class LoginComponent {
   }
 
   getUsernameAndPassword() {
-    this.authService.authenticateModel = new AuthenticateModel();
+    this.appAuthService.LoginDto = new LoginDto();
     var username: string = this._cookieService.getCookieValue('UserProfile.UsernameOrEmail');
 
     if (username) {
-      this.authService.authenticateModel.userLoginIdentity = this._encryptionService.decrypt(username);
+      this.appAuthService.LoginDto.userLoginIdentityAddress = this._encryptionService.decrypt(username);
     }
 
     if (username) {
-      this.authService.authenticateModel.rememberClient = true;
-      this.authService.rememberMe = true;
+      this.appAuthService.rememberMe = true;
     }
   }
 
   login(): void {
     this.submitting = true;
-    this.authService.authenticate((authenticateResult: AuthenticateResultModelResponseDto) => {
-      this.errorHandler.handleErrorResponse(authenticateResult, 'Login Failed');
+    this.appAuthService.authenticate((loginResult: LoginResultDtoResponseDto) => {
+      this.responseHandler.handleResponse<LoginResultDto>(loginResult, null, 'Login Failed');
       this.submitting = false;
     });
   }

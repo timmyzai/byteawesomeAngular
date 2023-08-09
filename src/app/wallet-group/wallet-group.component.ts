@@ -1,7 +1,13 @@
+// wallet-group.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CreateWalletDto, CreateWalletGroupDto, CoinDto, CoinDtoIEnumerableResponseDto, CoinServiceProxy, WalletDtoResponseDto, WalletGroupDto, WalletGroupDtoIEnumerableResponseDto, WalletGroupDtoResponseDto, WalletGroupsServiceProxy, WalletServiceProxy } from 'src/shared/service-proxies/wallet-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import {
+  CreateWalletGroupsDto, CreateWalletsDto,
+  EntityWalletGroupDto, EntityWalletGroupDtoIEnumerableResponseDto, EntityWalletGroupDtoResponseDto, EntityWalletsDto, EntityWalletsDtoResponseDto,
+  NetworksDto, NetworksDtoPagedListResponseDto,
+  NetworksServiceProxy, WalletGroupsServiceProxy, WalletServiceProxy
+} from 'src/shared/service-proxies/wallet-service-proxies';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 import { NotifyServices } from 'src/shared/services/notify.services';
 
 @Component({
@@ -10,114 +16,108 @@ import { NotifyServices } from 'src/shared/services/notify.services';
   styleUrls: ['./wallet-group.component.css']
 })
 export class WalletGroupComponent implements OnInit {
-  walletGroups: WalletGroupDto[];
-  coinList: CoinDto[];
+  walletGroups: EntityWalletGroupDto[] = [];
+  networkList: NetworksDto[] = [];
   isPageLoading = true;
   errorMsg: string = undefined;
   userId: string = undefined;
   selectedWalletGroupsId: string;
-  selectedCoinId: string;
+  selectedNetworkId: number;
 
   constructor(
     private walletGroupServices: WalletGroupsServiceProxy,
-    private walletServices: WalletServiceProxy,
-    private coinServices: CoinServiceProxy,
-    private errorHandler: ApiErrorHandlerService,
+    private walletService: WalletServiceProxy,
+    private networkService: NetworksServiceProxy,
+    private responseHandler: ApiResponseHandlerService,
     private router: Router,
     private notify: NotifyServices
   ) { }
 
-  ngOnInit(): void {
-    this.getWalletGroup();
-    this.getCoinList();
+  async ngOnInit() {
+    await this.initializeData();
   }
-  private async getCoinList() {
+
+  private async initializeData() {
     try {
       this.isPageLoading = true;
-
-      await this.coinServices.get().toPromise()
-        .then((networkListResponseDto: CoinDtoIEnumerableResponseDto) => {
-          if (networkListResponseDto.isSuccess) {
-            this.coinList = networkListResponseDto.result;
-            if (this.coinList.length > 0) {
-              this.selectedCoinId = this.coinList[0].id;
-            }
-          } else {
-            this.errorHandler.handleErrorResponse(networkListResponseDto, 'getWalletById Failed');
-          }
-        })
-        .catch((error: any) => {
-          this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-        });
+      this.userId = localStorage.getItem('loggedInUserId');
+      await Promise.all([this.getWalletGroup(), this.getNetworkList()]);
     } finally {
       this.isPageLoading = false;
+    }
+  }
+
+  private async getNetworkList() {
+    try {
+      const networkListResponseDto = await this.networkService.getAllNetworks(undefined, undefined).toPromise();
+      this.responseHandler.handleResponse<NetworksDto[]>(
+        networkListResponseDto,
+        data => {
+          this.networkList = data;
+          if (this.networkList.length > 0) {
+            this.selectedNetworkId = this.networkList[0].id;
+          }
+        },
+        'getNetworkList Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'getNetworkList Failed');
     }
   }
 
   private async getWalletGroup() {
     try {
-      this.isPageLoading = true;
-      const userId = localStorage.getItem('loggedInUserId');
-
-      await this.walletGroupServices.getByUserId(userId).toPromise()
-        .then((walletGroupDtoListResponseDto: WalletGroupDtoIEnumerableResponseDto) => {
-          if (walletGroupDtoListResponseDto.isSuccess) {
-            this.walletGroups = walletGroupDtoListResponseDto.result;
-            if (this.walletGroups !=null && this.walletGroups.length > 0) {
-              this.selectedWalletGroupsId = this.walletGroups[0].id;
-            }
-          } else {
-            this.errorHandler.handleErrorResponse(walletGroupDtoListResponseDto, 'getWalletById Failed');
+      const walletGroupDtoListResponseDto = await this.walletGroupServices.getByUserId(this.userId).toPromise();
+      this.responseHandler.handleResponse<EntityWalletGroupDto[]>(
+        walletGroupDtoListResponseDto,
+        data => {
+          this.walletGroups = data;
+          if (this.walletGroups.length > 0) {
+            this.selectedWalletGroupsId = this.walletGroups[0].id;
           }
-        })
-        .catch((error: any) => {
-          this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-        });
-    } finally {
-      this.isPageLoading = false;
+        },
+        'getWalletGroup Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'getWalletGroup Failed');
     }
   }
 
   async addWalletGroup() {
     try {
-      var param = new CreateWalletGroupDto();
-
-      await this.walletGroupServices.add(param).toPromise()
-      .then((walletGroupResponseDto: WalletGroupDtoResponseDto) => {
-        if (walletGroupResponseDto.isSuccess) {
-          this.notify.showSuccess("Add Wallet Group Successful", "Success");
-        } else {
-          this.errorHandler.handleErrorResponse(walletGroupResponseDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
-    } finally {
-      this.getWalletGroup();
-      this.userId = undefined;
+      const param = new CreateWalletGroupsDto();
+      param.userId = this.userId;
+      const walletGroupResponseDto = await this.walletGroupServices.createWalletGroup(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletGroupDto>(
+        walletGroupResponseDto,
+        () => {
+          this.notify.showSuccess('Add Wallet Group Successful', 'Success');
+          this.getWalletGroup();
+        },
+        'addWalletGroup Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'addWalletGroup Failed');
     }
   }
 
   async addWallet() {
     try {
-      var param = new CreateWalletDto();
+      const param = new CreateWalletsDto();
       param.walletGroupsId = this.selectedWalletGroupsId;
-      param.coin = this.coinList.find(x => x.id == this.selectedCoinId);
+      param.networkId = this.networkList.find(x => x.id == this.selectedNetworkId)?.id;
 
-      await this.walletServices.add(param).toPromise()
-      .then((walletResponseDto: WalletDtoResponseDto) => {
-        if (walletResponseDto.isSuccess) {
-          this.notify.showSuccess("Add Wallet Successful", "Success");
-        } else {
-          this.errorHandler.handleErrorResponse(walletResponseDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
-    } finally {
-      this.getWalletGroup();
+      const walletResponseDto = await this.walletService.createWallet(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletsDto>(
+        walletResponseDto,
+        () => {
+          this.notify.showSuccess('Add Wallet Successful', 'Success');
+          this.getWalletGroup();
+        },
+        'addWallet Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'addWallet Failed');
     }
   }
 
@@ -130,45 +130,20 @@ export class WalletGroupComponent implements OnInit {
 
   async updateWalletGroup(walletGroupId: string) {
     try {
-      var param = this.walletGroups.find(x => x.id == walletGroupId);
-      param.isActive = !param.isActive;
+      const param = this.walletGroups.find(x => x.id == walletGroupId);
+      param.walletGroupData.isActive = !param.walletGroupData.isActive;
 
-      await this.walletGroupServices.update(param).toPromise()
-      .then((walletGroupResponseDto: WalletGroupDtoResponseDto) => {
-        if (walletGroupResponseDto.isSuccess) {
-          this.notify.showSuccess("Add Wallet Group Successful", "Success");
-        } else {
-          this.errorHandler.handleErrorResponse(walletGroupResponseDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
-    } finally {
-      this.getWalletGroup();
-      this.userId = undefined;
-    }
-  }
-
-  async createCustoWalletGroup(walletGroupId: string) {
-    try {
-      var param = this.walletGroups.find(x => x.id == walletGroupId);
-
-
-      await this.walletGroupServices.createCustoWalletGroup(param).toPromise()
-      .then((walletGroupResponseDto: WalletGroupDtoResponseDto) => {
-        if (walletGroupResponseDto.isSuccess) {
-          this.notify.showSuccess("Create Custo Wallet Group Successful", "Success");
-        } else {
-          this.errorHandler.handleErrorResponse(walletGroupResponseDto, 'getWalletById Failed');
-        }
-      })
-      .catch((error: any) => {
-        this.errorHandler.handleCommonApiErrorReponse(error, "getWalletById Failed");;
-      });
-    } finally {
-      this.getWalletGroup();
-      this.userId = undefined;
+      const walletGroupResponseDto = await this.walletGroupServices.updateWalletGroup(param).toPromise();
+      this.responseHandler.handleResponse<EntityWalletGroupDto>(
+        walletGroupResponseDto,
+        () => {
+          this.notify.showSuccess('Update Wallet Group Successful', 'Success');
+          this.getWalletGroup();
+        },
+        'updateWalletGroup Failed'
+      );
+    } catch (error) {
+      this.responseHandler.handleCommonApiErrorResponse(error, 'updateWalletGroup Failed');
     }
   }
 

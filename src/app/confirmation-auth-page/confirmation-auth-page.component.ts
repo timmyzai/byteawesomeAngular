@@ -1,10 +1,10 @@
 import { Component, OnInit, } from '@angular/core';
 import { Router } from '@angular/router';
 import { accountModuleAnimation } from 'src/shared/animations/routerTransition';
-import { AppAuthService } from 'src/shared/auth/app-auth.service';
-import { AuthenticateResultModelResponseDto } from 'src/shared/service-proxies/auth-service-proxies';
+import { AppappAuthService } from 'src/shared/auth/app-auth.service';
+import { LoginResultDto, LoginResultDtoResponseDto } from 'src/shared/service-proxies/user-service-proxies';
 import { UserServiceProxy } from 'src/shared/service-proxies/user-service-proxies';
-import { ApiErrorHandlerService } from 'src/shared/services/apierrorhandler.service';
+import { ApiResponseHandlerService } from 'src/shared/services/apierrorhandler.service';
 import { CookiesService } from 'src/shared/services/cookies.service';
 import { EncryptionService } from 'src/shared/services/encryption.service';
 import { NotifyServices } from 'src/shared/services/notify.services';
@@ -27,8 +27,8 @@ export class ConfirmationAuthPageComponent implements OnInit {
 
   constructor(
     private route: Router,
-    public authService: AppAuthService,
-    private errorHandler: ApiErrorHandlerService,
+    public appAuthService: AppappAuthService,
+    private responseHandler: ApiResponseHandlerService,
     private userService: UserServiceProxy,
     private notify: NotifyServices,
     private _cookieService: CookiesService,
@@ -57,7 +57,6 @@ export class ConfirmationAuthPageComponent implements OnInit {
       event.target.value = otp.slice(0, -1);
       return;
     }
-    console.log(otp);
 
     this.otpBoxes = Array(this.otpLength).fill('');
     for (let i = 0; i < otp.length; i++) {
@@ -70,9 +69,9 @@ export class ConfirmationAuthPageComponent implements OnInit {
   submit() {
     this.submitting = true;
     const tacCode = this.otpBoxes.join('');
-    this.authService.authenticateModel.emailTacCode = tacCode;
-    this.authService.authenticate((authenticateResult: AuthenticateResultModelResponseDto) => {
-      this.errorHandler.handleErrorResponse(authenticateResult, 'Login Failed');
+    this.appAuthService.LoginDto.emailTacCode = tacCode;
+    this.appAuthService.authenticate((loginResult: LoginResultDtoResponseDto) => {
+      this.responseHandler.handleResponse<LoginResultDto>(loginResult, null, 'Login Failed');
       this.submitting = false;
     });
   }
@@ -91,7 +90,7 @@ export class ConfirmationAuthPageComponent implements OnInit {
         if (response.isSuccess) {
           this.notify.showSuccess("Confirmation email sent successfully", "Success");
         } else {
-          this.errorHandler.handleErrorResponse(response, 'sendConfirmationEmail failed');
+          this.responseHandler.handleResponse<boolean>(response, null, 'Send Confirmation Emal Failed');
         }
       },
       error => {

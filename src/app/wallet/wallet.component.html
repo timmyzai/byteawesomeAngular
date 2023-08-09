@@ -1,49 +1,75 @@
-<div class="card" *ngIf="!isPageLoading">
-  <div class="card-header">
-    Wallet Information
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">ID: {{ wallet.id }}</h5>
-    <h5 class="card-text">Address: {{ wallet.address }}</h5>
-    <p class="card-text">Coin: {{ wallet.coin.fSymbol }} ({{ wallet.coin.fNetwork }})</p>
-    <p class="card-text">Balance: {{ wallet.balance }}</p>
-    <p class="card-text">Add Balance: <button (click)="updateBalance(+1000)">Add</button></p>
-    <p class="card-text">Minus Balance: <button (click)="updateBalance(-1000)">Minus</button></p>
-    <p class="card-text">IsCWCreated: {{ wallet.isCustoWalletCreated }}</p>
-    <p class="card-text">Active: <button (click)="disableEnableWallet()">{{wallet.isActive}}</button></p>
-  </div>
-  <div class="card-header">
-    Investment
-  </div>
-  <div class="card-body">
-    <p class="card-text">Invest: <button (click)="investment(200)">Invest</button></p>
-  </div>
+<div class="wallet-container" *ngIf="!isPageLoading">
+    <div class="wallet-details">
+        <h2>Wallet Details</h2>
+        <div class="wallet-info">
+            <p><strong>Wallet ID:</strong> {{ walletId }}</p>
+            <h5 class="card-text">Address: {{ wallet.walletData.address }}</h5>
+            <h5 class="card-text">Network:
+                {{ wallet.walletData.network.network }}
+                ({{wallet.walletData.network.networkName}})</h5>
+            <p class="card-text">Active:
+                <button (click)="disableEnableWallet()">
+                    {{wallet.walletData.isActive}}
+                </button>
+            </p>
+        </div>
+        <div class="asset-details">
+            <h3>Asset Details</h3>
+            <ul>
+                <li *ngFor="let asset of wallet.walletData.assets">
+                    <p><strong>Symbol:</strong> {{ asset.assetData.symbol }}</p>
+                    <p><strong>Balance:</strong> {{ asset.assetData.balance }}</p>
+                    <p class="card-text">
+                        Add Balance:
+                        <button (click)="updateBalance(+1000, asset.assetData.symbolsId)">
+                            Add
+                        </button>
+                    </p>
+                    <p class="card-text">
+                        Minus Balance:
+                        <button (click)="updateBalance(-1000, asset.assetData.symbolsId)">
+                            Minus
+                        </button>
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-  <div class="card-header">
-    Transfer
-  </div>
-  <div class="card-body">
-    <form (ngSubmit)="transfer()">
-      <label>
-        Amount:
-        <select name="selectedWalletGroupsId" [(ngModel)]="transferAmount" required>
-          <option [value]="100">{{ 100 }}</option>
-          <option [value]="200">{{ 200 }}</option>
-          <option [value]="500">{{ 500 }}</option>
-        </select>
-      </label>
-      <br>
-      <label *ngIf="transferTarget!=null && transferTarget.length > 0">
-        Transfer Target:
-        <select name="selectedTransferTargetWalletId" [(ngModel)]="selectedTransferTargetWalletId" required>
-          <option *ngFor="let toWallet of transferTarget" [value]="toWallet.id">
-            {{ toWallet.address}}
-            {{ toWallet.balance}}
-          </option>
-        </select>
-      </label>
-      <br>
-      <button type="submit">Start Transfer</button>
-    </form>
-  </div>
+    <div class="investment-section">
+        <h2>Investment</h2>
+        <form (submit)="investment(investmentAmount, selectedInvestmentSymbol)">
+            <label for="investmentAmount">Amount:</label>
+            <input type="number" id="investmentAmount" [(ngModel)]="investmentAmount" name="investmentAmount" required>
+            <label for="investmentSymbol">Symbol:</label>
+            <select id="investmentSymbol" [(ngModel)]="selectedInvestmentSymbol" name="investmentSymbol" required>
+                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network }})
+                </option>
+            </select>
+            <button type="submit">Invest</button>
+        </form>
+    </div>
+
+    <div class="transfer-section">
+        <h2>Transfer</h2>
+        <form (submit)="transfer(selectedTransferSymbol)">
+            <label for="transferAmount">Amount:</label>
+            <input type="number" id="transferAmount" [(ngModel)]="transferAmount" name="transferAmount" required>
+            <label for="transferSymbol">Symbol:</label>
+            <select id="transferSymbol" [(ngModel)]="selectedTransferSymbol" name="transferSymbol" required>
+                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network }})
+                </option>
+            </select>
+            <label for="transferTarget">Transfer To:</label>
+            <select id="transferTarget" [(ngModel)]="selectedTransferTargetWalletId" name="transferTarget" required>
+                <option *ngFor="let target of transferTarget" [value]="target.id">{{ target.walletData.address }}
+                </option>
+            </select>
+            <button type="submit">Transfer</button>
+        </form>
+    </div>
+
+
 </div>

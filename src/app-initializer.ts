@@ -13,7 +13,6 @@ export class AppInitializer {
     return this.http.get<any>('assets/appconfig.json').pipe(
       tap((response) => {
         AppConsts.appBaseUrl = response.appBaseUrl;
-        AppConsts.remoteAuthServiceBaseUrl = response.remoteAuthServiceBaseUrl;
         AppConsts.remoteUserServiceBaseUrl = response.remoteUserServiceBaseUrl;
         AppConsts.remoteWalletServiceBaseUrl = response.remoteWalletServiceBaseUrl;
       })

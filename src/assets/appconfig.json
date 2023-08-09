@@ -1,6 +1,5 @@
 {
   "appBaseUrl": "http://localhost:4200",
-  "remoteAuthServiceBaseUrl": "http://localhost:7183",
   "remoteUserServiceBaseUrl": "http://localhost:7181",
   "remoteWalletServiceBaseUrl": "https://localhost:7184"
 }
