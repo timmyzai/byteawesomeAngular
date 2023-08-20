@@ -38,7 +38,7 @@ export class RegistrationComponent {
           }
         })
         .catch((error: any) => {
-          this.responseHandler.handleCommonApiErrorResponse(error, "Registration Failed");;
+          this.responseHandler.handleUnhandledException(error, "Registration Failed");;
         });
     } finally {
       this.submitting = false;

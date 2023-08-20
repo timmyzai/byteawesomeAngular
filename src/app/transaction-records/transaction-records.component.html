@@ -1,0 +1,54 @@
+<div class="row wallet-container" *ngIf="!isPageLoading">
+    <div class="col-md-6 col-sm-12">
+        <div class="section" *ngIf="transactionList && transactionList.length > 0; else noTransaction">
+            <ng-container *ngFor="let transaction of transactionList; let i = index;">
+                <h2>Transaction{{ i + 1 }}</h2>
+                <div class="wallet-policy-info">
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            Transaction Id: {{ transaction.id }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            Executor User Id: {{ transaction.transactionData.executorUserId }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            From Wallet Id: {{ transaction.transactionData.fromWalletId }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            From Wallet Address: {{ transaction.transactionData.fromWalletAddress }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            To Wallet Id: {{ transaction.transactionData.toWalletId }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            To Wallet Address: {{ transaction.transactionData.toWalletAddress }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            Status: {{ getStatusName(transaction.transactionData.status) }}
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold">
+                            Transfer Amount: {{ transaction.transactionData.amount }}
+                        </span>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <ng-template #noTransaction>
+            No Transaction found.
+        </ng-template>
+    </div>
+</div>

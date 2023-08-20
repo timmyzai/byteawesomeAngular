@@ -94,7 +94,7 @@ export class ForgotpasswordComponent implements OnInit {
           }
         })
         .catch((error: any) => {
-          this.responseHandler.handleCommonApiErrorResponse(error, "changeUserPasswordByEmail Failed");;
+          this.responseHandler.handleUnhandledException(error, "changeUserPasswordByEmail Failed");;
         });
     } finally {
       this.submitting = false;

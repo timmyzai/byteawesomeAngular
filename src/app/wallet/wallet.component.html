@@ -1,75 +1,200 @@
-<div class="wallet-container" *ngIf="!isPageLoading">
-    <div class="wallet-details">
-        <h2>Wallet Details</h2>
-        <div class="wallet-info">
-            <p><strong>Wallet ID:</strong> {{ walletId }}</p>
-            <h5 class="card-text">Address: {{ wallet.walletData.address }}</h5>
-            <h5 class="card-text">Network:
-                {{ wallet.walletData.network.network }}
-                ({{wallet.walletData.network.networkName}})</h5>
-            <p class="card-text">Active:
-                <button (click)="disableEnableWallet()">
-                    {{wallet.walletData.isActive}}
-                </button>
-            </p>
+<div class="row wallet-container" *ngIf="!isPageLoading && wallet && wallet.walletData">
+    <div class="col-md-6 col-sm-12">
+        <div class="section">
+            <h2>Wallet Details</h2>
+            <div class="wallet-info">
+                <p><strong>Wallet ID:</strong> {{ walletId }}</p>
+                <h5 class="card-text">Address: {{ wallet.walletData.address }}</h5>
+                <h5 class="card-text">Network:
+                    {{ wallet.walletData.network.network }}
+                    ({{wallet.walletData.network.networkName}})
+                </h5>
+                <h5 class="card-text">Active:
+                    <button class="btn btn-with-margin btn-danger" (click)="disableEnableWallet()">
+                        {{wallet.walletData.isActive}}
+                    </button>
+                </h5>
+            </div>
+            <div class="asset-details">
+                <div class="dropdown"
+                    *ngIf="wallet.walletData.assets && wallet.walletData.assets.length > 0; else noAsset">
+                    <button class="btn btn-with-margin btn-secondary dropdown-toggle" type="button"
+                        id="walletAssetDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Assets ({{ wallet.walletData.assets.length }})
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="walletAssetDropdown">
+                        <ng-container *ngFor="let asset of wallet.walletData.assets">
+                            <p><strong>Symbol:</strong> {{ asset.assetData.symbol }}</p>
+                            <p><strong>Balance:</strong> {{ asset.assetData.balance }}</p>
+                            <p class="card-text">
+                                Add Balance:
+                                <button (click)="updateBalance(+1000, asset.assetData.symbolsId)">
+                                    Add
+                                </button>
+                            </p>
+                            <p class="card-text">
+                                Minus Balance:
+                                <button (click)="updateBalance(-1000, asset.assetData.symbolsId)">
+                                    Minus
+                                </button>
+                            </p>
+                        </ng-container>
+                    </div>
+                </div>
+                <ng-template #noAsset>
+                    No asset found.
+                </ng-template>
+            </div>
+            <div class="wallet-policy-details">
+                <div class="dropdown"
+                    *ngIf="wallet.walletData.walletPolicies && wallet.walletData.walletPolicies.length > 0; else noWalletPolicy">
+                    <button class="btn btn-with-margin btn-secondary dropdown-toggle" type="button"
+                        id="walletPolicyDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Wallet Policy ({{ wallet.walletData.walletPolicies.length }})
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="walletPolicyDropdown">
+                        <ng-container *ngFor="let walletPolicy of wallet.walletData.walletPolicies">
+                            <a class="dropdown-item" [routerLink]="['/wallet-policy', walletPolicy.id]">
+                                <div class=" d-flex flex-column">
+                                    <span class="fw-bold">
+                                        Delegate User Id:{{ walletPolicy.walletPoliciesData.delegateUserId }}
+                                    </span>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">
+                                        Status: {{ getStatusName(walletPolicy.walletPoliciesData.status) }}
+                                    </span>
+                                </div>
+                            </a>
+                        </ng-container>
+                    </div>
+                </div>
+                <ng-template #noWalletPolicy>
+                    No Wallet Policy found.
+                </ng-template>
+            </div>
         </div>
-        <div class="asset-details">
-            <h3>Asset Details</h3>
-            <ul>
-                <li *ngFor="let asset of wallet.walletData.assets">
-                    <p><strong>Symbol:</strong> {{ asset.assetData.symbol }}</p>
-                    <p><strong>Balance:</strong> {{ asset.assetData.balance }}</p>
-                    <p class="card-text">
-                        Add Balance:
-                        <button (click)="updateBalance(+1000, asset.assetData.symbolsId)">
-                            Add
-                        </button>
-                    </p>
-                    <p class="card-text">
-                        Minus Balance:
-                        <button (click)="updateBalance(-1000, asset.assetData.symbolsId)">
-                            Minus
-                        </button>
-                    </p>
-                </li>
-            </ul>
+        <div class="section">
+            <h2>Investment</h2>
+            <form (submit)="SubmitInvestment()">
+                <div class="mb-3">
+                    <label class="form-label" for="investmentAmount">Amount:</label>
+                    <input type="number" id="investmentAmount" [(ngModel)]="this.InvestmentDtoInput.amount"
+                        name="investmentAmount" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="investmentSymbol">Symbol:</label>
+                    <select id="investmentSymbol" [(ngModel)]="InvestmentDtoInput.symbolsId" name="investmentSymbol"
+                        required class="form-select">
+                        <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                            {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network}})
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-with-margin btn-primary">Invest Now</button>
+            </form>
+        </div>
+        <div class="section">
+            <h2>Transfer</h2>
+            <form (submit)="SubmitTransfer()">
+                <label class="form-label" for="transferAmount">Amount:</label>
+                <input type="number" id="transferAmount" [(ngModel)]="this.TransferDtoInput.amount"
+                    name="transferAmount" required class="form-control">
+                <label class="form-label" for="transferSymbol">Symbol:</label>
+                <select id="transferSymbol" [(ngModel)]="TransferDtoInput.symbolsId" name="transferSymbol" required
+                    class="form-select">
+                    <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                        {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network}})
+                    </option>
+                </select>
+                <label class="form-label" for="transferTarget">Transfer To:</label>
+                <input type="text" id="transferTarget" [(ngModel)]="this.TransferDtoInput.toWalletAddress"
+                    name="transferTarget" required class="form-control">
+                <button type="submit" class="btn btn-with-margin btn-primary">Transfer Now</button>
+            </form>
         </div>
     </div>
-
-    <div class="investment-section">
-        <h2>Investment</h2>
-        <form (submit)="investment(investmentAmount, selectedInvestmentSymbol)">
-            <label for="investmentAmount">Amount:</label>
-            <input type="number" id="investmentAmount" [(ngModel)]="investmentAmount" name="investmentAmount" required>
-            <label for="investmentSymbol">Symbol:</label>
-            <select id="investmentSymbol" [(ngModel)]="selectedInvestmentSymbol" name="investmentSymbol" required>
-                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
-                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network }})
-                </option>
-            </select>
-            <button type="submit">Invest</button>
-        </form>
+    <div class="col-md-6 col-sm-12" *ngIf="wallet.walletData.userId == userId">
+        <div class="section">
+            <h2>Wallet Delegation</h2>
+            <form (ngSubmit)="SubmitCreateWalletPolicy()">
+                <div class="form-group">
+                    <label class="form-label" for="delegateUserId">Delegate User ID:</label>
+                    <input type="text" class="form-control" id="delegateUserId"
+                        [(ngModel)]="createWalletPolicyInput.delegateUserId" name="delegateUserId" required>
+                </div>
+                <div class="form-group">
+                    <h4>Transfer Limits</h4>
+                    <div class="transfer-limit"
+                        *ngFor="let limit of createWalletPolicyInput.transferRules?.transferLimits; let i = index;">
+                        <div class="transfer-limit-form">
+                            <h3 class="text-center">
+                                Limit {{ i + 1}}
+                            </h3>
+                            <button type="button" class="btn btn-danger delete-button" (click)="deleteTransferLimit(i)">
+                                X
+                            </button>
+                            <label class="form-label" for="investmentSymbol">Symbol:</label>
+                            <select [(ngModel)]="limit.symbolsId" name="symbolsId {{ i }}" id="symbolsId{{ i }}" name="
+                                symbolsId{{ i }}" required class="form-select">
+                                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network}})
+                                </option>
+                            </select>
+                            <label class="form-label" for="dayLimit{{ i }}">Day Limit:</label>
+                            <input type="number" class="form-control" id="dayLimit{{ i }}" [(ngModel)]="limit.dayLimit"
+                                name="dayLimit{{ i }}">
+                            <label class="form-label" for="weekLimit{{ i }}">Week Limit:</label>
+                            <input type="number" class="form-control" id="weekLimit{{ i }}"
+                                [(ngModel)]="limit.weekLimit" name="weekLimit{{ i }}">
+                            <label class="form-label" for="monthLimit{{ i }}">Month Limit:</label>
+                            <input type="number" class="form-control" id="monthLimit{{ i }}"
+                                [(ngModel)]="limit.monthLimit" name="monthLimit{{ i }}">
+                            <label class="form-label" for="yearLimit{{ i }}">Year Limit:</label>
+                            <input type="number" class="form-control" id="yearLimit{{ i }}"
+                                [(ngModel)]="limit.yearLimit" name="yearLimit{{ i }}">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-with-margin btn-secondary" (click)="addTransferLimit()">
+                        Add Transfer Limit
+                    </button>
+                </div>
+                <div class="form-group">
+                    <h4>Whitelist Addresses</h4>
+                    <div class="whitelist-address-form"
+                        *ngFor="let address of createWalletPolicyInput.transferRules?.whitelistAddresses; let i = index;">
+                        <h3 class="text-center">
+                            Address {{ i + 1}}
+                        </h3>
+                        <button type="button" class="btn btn-danger delete-button" (click)="deleteWhitelistAddress(i)">
+                            X
+                        </button>
+                        <label class="form-label" for="address">Address</label>
+                        <input type="text" class="form-control" id="address" [(ngModel)]="address.address"
+                            name="address{{ i }}">
+                        <label class="form-label" for="tagName">Tag Name:</label>
+                        <input type="text" class="form-control" id="tagName" [(ngModel)]="address.tagName"
+                            name="tagName{{ i }}">
+                    </div>
+                    <button type="button" class="btn btn-with-margin btn-secondary" (click)="addWhitelistAddress()">
+                        Add Whitelist Address
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="isTransferApprovalNeeded">Transfer Approval Needed:</label>
+                    <input type="checkbox" class="form-check-input" id="isTransferApprovalNeeded"
+                        [checked]="createWalletPolicyInput?.transferRules?.isTransferApprovalNeeded"
+                        (change)="updateTransferApproval($event)" name="isTransferApprovalNeeded">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="expiryDate">Expiry Date:</label>
+                    <div class="input-group">
+                        <input type="datetime-local" class="form-control" id="expiryDate" name="expiryDate"
+                            [(ngModel)]="createWalletPolicyInput.expiryDate" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-with-margin btn-primary">Create Wallet Policy</button>
+            </form>
+        </div>
     </div>
-
-    <div class="transfer-section">
-        <h2>Transfer</h2>
-        <form (submit)="transfer(selectedTransferSymbol)">
-            <label for="transferAmount">Amount:</label>
-            <input type="number" id="transferAmount" [(ngModel)]="transferAmount" name="transferAmount" required>
-            <label for="transferSymbol">Symbol:</label>
-            <select id="transferSymbol" [(ngModel)]="selectedTransferSymbol" name="transferSymbol" required>
-                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
-                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network }})
-                </option>
-            </select>
-            <label for="transferTarget">Transfer To:</label>
-            <select id="transferTarget" [(ngModel)]="selectedTransferTargetWalletId" name="transferTarget" required>
-                <option *ngFor="let target of transferTarget" [value]="target.id">{{ target.walletData.address }}
-                </option>
-            </select>
-            <button type="submit">Transfer</button>
-        </form>
-    </div>
-
-
 </div>

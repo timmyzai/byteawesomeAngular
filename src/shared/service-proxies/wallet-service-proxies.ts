@@ -2363,6 +2363,471 @@ export class SymbolsServiceProxy {
 }
 
 @Injectable()
+export class TransactionsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(WALLET_API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    add(body: CreateTransactionsDto | undefined): Observable<TransactionsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/Add";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdd(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdd(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionsDtoResponseDto>;
+        }));
+    }
+
+    protected processAdd(response: HttpResponseBase): Observable<TransactionsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    update(body: TransactionsDto | undefined): Observable<TransactionsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionsDtoResponseDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<TransactionsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined): Observable<TransactionsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionsDtoResponseDto>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<TransactionsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getById(id: string | undefined): Observable<TransactionsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/GetById?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionsDtoResponseDto>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<TransactionsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionsDtoResponseDto>(null as any);
+    }
+
+    /**
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return Success
+     */
+    getAll(pageNumber: number | undefined, pageSize: number | undefined): Observable<TransactionsDtoPagedListResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/GetAll?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TransactionsDtoPagedListResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TransactionsDtoPagedListResponseDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<TransactionsDtoPagedListResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TransactionsDtoPagedListResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TransactionsDtoPagedListResponseDto>(null as any);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    getMyTransactionRecords(userId: string | undefined): Observable<EntityTransactionsDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/GetMyTransactionRecords?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMyTransactionRecords(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMyTransactionRecords(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<EntityTransactionsDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<EntityTransactionsDtoIEnumerableResponseDto>;
+        }));
+    }
+
+    protected processGetMyTransactionRecords(response: HttpResponseBase): Observable<EntityTransactionsDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EntityTransactionsDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<EntityTransactionsDtoIEnumerableResponseDto>(null as any);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    getAllPendingTransaction(userId: string | undefined): Observable<EntityTransactionsDtoIEnumerableResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/GetAllPendingTransaction?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllPendingTransaction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllPendingTransaction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<EntityTransactionsDtoIEnumerableResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<EntityTransactionsDtoIEnumerableResponseDto>;
+        }));
+    }
+
+    protected processGetAllPendingTransaction(response: HttpResponseBase): Observable<EntityTransactionsDtoIEnumerableResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EntityTransactionsDtoIEnumerableResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<EntityTransactionsDtoIEnumerableResponseDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    approveOrRejectTransaction(body: ApproveOrRejectTransactionDto | undefined): Observable<EntityTransactionsDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/Transactions/ApproveOrRejectTransaction";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processApproveOrRejectTransaction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApproveOrRejectTransaction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<EntityTransactionsDtoResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<EntityTransactionsDtoResponseDto>;
+        }));
+    }
+
+    protected processApproveOrRejectTransaction(response: HttpResponseBase): Observable<EntityTransactionsDtoResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EntityTransactionsDtoResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<EntityTransactionsDtoResponseDto>(null as any);
+    }
+}
+
+@Injectable()
 export class WalletServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -2883,15 +3348,15 @@ export class WalletServiceProxy {
     }
 
     /**
-     * @param userId (optional) 
+     * @param walletGroupId (optional) 
      * @return Success
      */
-    getByWalletGroupId(userId: string | undefined): Observable<EntityWalletsDtoIEnumerableResponseDto> {
+    getByWalletGroupId(walletGroupId: string | undefined): Observable<EntityWalletsDtoIEnumerableResponseDto> {
         let url_ = this.baseUrl + "/api/Wallet/GetByWalletGroupId?";
-        if (userId === null)
-            throw new Error("The parameter 'userId' cannot be null.");
-        else if (userId !== undefined)
-            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        if (walletGroupId === null)
+            throw new Error("The parameter 'walletGroupId' cannot be null.");
+        else if (walletGroupId !== undefined)
+            url_ += "walletGroupId=" + encodeURIComponent("" + walletGroupId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -3160,62 +3625,6 @@ export class WalletServiceProxy {
             }));
         }
         return _observableOf<EntityWalletsDtoIEnumerableResponseDto>(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    approveTransaction(body: ApproveTransactionDto | undefined): Observable<EntityTransactionsDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/Wallet/ApproveTransaction";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processApproveTransaction(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processApproveTransaction(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<EntityTransactionsDtoResponseDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<EntityTransactionsDtoResponseDto>;
-        }));
-    }
-
-    protected processApproveTransaction(response: HttpResponseBase): Observable<EntityTransactionsDtoResponseDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = EntityTransactionsDtoResponseDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<EntityTransactionsDtoResponseDto>(null as any);
     }
 }
 
@@ -4371,8 +4780,8 @@ export class WalletPoliciesServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    agreeWalletPolicy(body: AgreeWalletPolicyDto | undefined): Observable<EntityWalletPolicyDtoResponseDto> {
-        let url_ = this.baseUrl + "/api/WalletPolicies/AgreeWalletPolicy";
+    agreeOrRejectWalletPolicy(body: AgreeOrRejectWalletPolicyDto | undefined): Observable<EntityWalletPolicyDtoResponseDto> {
+        let url_ = this.baseUrl + "/api/WalletPolicies/AgreeOrRejectWalletPolicy";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -4388,11 +4797,11 @@ export class WalletPoliciesServiceProxy {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAgreeWalletPolicy(response_);
+            return this.processAgreeOrRejectWalletPolicy(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAgreeWalletPolicy(response_ as any);
+                    return this.processAgreeOrRejectWalletPolicy(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<EntityWalletPolicyDtoResponseDto>;
                 }
@@ -4401,7 +4810,7 @@ export class WalletPoliciesServiceProxy {
         }));
     }
 
-    protected processAgreeWalletPolicy(response: HttpResponseBase): Observable<EntityWalletPolicyDtoResponseDto> {
+    protected processAgreeOrRejectWalletPolicy(response: HttpResponseBase): Observable<EntityWalletPolicyDtoResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -4424,11 +4833,11 @@ export class WalletPoliciesServiceProxy {
     }
 }
 
-export class AgreeWalletPolicyDto implements IAgreeWalletPolicyDto {
+export class AgreeOrRejectWalletPolicyDto implements IAgreeOrRejectWalletPolicyDto {
     walletPolicyId: string;
     isAgree: boolean;
 
-    constructor(data?: IAgreeWalletPolicyDto) {
+    constructor(data?: IAgreeOrRejectWalletPolicyDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4444,9 +4853,9 @@ export class AgreeWalletPolicyDto implements IAgreeWalletPolicyDto {
         }
     }
 
-    static fromJS(data: any): AgreeWalletPolicyDto {
+    static fromJS(data: any): AgreeOrRejectWalletPolicyDto {
         data = typeof data === 'object' ? data : {};
-        let result = new AgreeWalletPolicyDto();
+        let result = new AgreeOrRejectWalletPolicyDto();
         result.init(data);
         return result;
     }
@@ -4458,24 +4867,24 @@ export class AgreeWalletPolicyDto implements IAgreeWalletPolicyDto {
         return data;
     }
 
-    clone(): AgreeWalletPolicyDto {
+    clone(): AgreeOrRejectWalletPolicyDto {
         const json = this.toJSON();
-        let result = new AgreeWalletPolicyDto();
+        let result = new AgreeOrRejectWalletPolicyDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IAgreeWalletPolicyDto {
+export interface IAgreeOrRejectWalletPolicyDto {
     walletPolicyId: string;
     isAgree: boolean;
 }
 
-export class ApproveTransactionDto implements IApproveTransactionDto {
+export class ApproveOrRejectTransactionDto implements IApproveOrRejectTransactionDto {
     transactionId: string;
     approve: boolean;
 
-    constructor(data?: IApproveTransactionDto) {
+    constructor(data?: IApproveOrRejectTransactionDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4491,9 +4900,9 @@ export class ApproveTransactionDto implements IApproveTransactionDto {
         }
     }
 
-    static fromJS(data: any): ApproveTransactionDto {
+    static fromJS(data: any): ApproveOrRejectTransactionDto {
         data = typeof data === 'object' ? data : {};
-        let result = new ApproveTransactionDto();
+        let result = new ApproveOrRejectTransactionDto();
         result.init(data);
         return result;
     }
@@ -4505,15 +4914,15 @@ export class ApproveTransactionDto implements IApproveTransactionDto {
         return data;
     }
 
-    clone(): ApproveTransactionDto {
+    clone(): ApproveOrRejectTransactionDto {
         const json = this.toJSON();
-        let result = new ApproveTransactionDto();
+        let result = new ApproveOrRejectTransactionDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IApproveTransactionDto {
+export interface IApproveOrRejectTransactionDto {
     transactionId: string;
     approve: boolean;
 }
@@ -4526,7 +4935,6 @@ export class AssetDataDto implements IAssetDataDto {
     networkName: string | undefined;
     walletsId: string;
     balance: number;
-    onholdBalance: number;
 
     constructor(data?: IAssetDataDto) {
         if (data) {
@@ -4546,7 +4954,6 @@ export class AssetDataDto implements IAssetDataDto {
             this.networkName = _data["networkName"];
             this.walletsId = _data["walletsId"];
             this.balance = _data["balance"];
-            this.onholdBalance = _data["onholdBalance"];
         }
     }
 
@@ -4566,7 +4973,6 @@ export class AssetDataDto implements IAssetDataDto {
         data["networkName"] = this.networkName;
         data["walletsId"] = this.walletsId;
         data["balance"] = this.balance;
-        data["onholdBalance"] = this.onholdBalance;
         return data;
     }
 
@@ -4586,7 +4992,6 @@ export interface IAssetDataDto {
     networkName: string | undefined;
     walletsId: string;
     balance: number;
-    onholdBalance: number;
 }
 
 export class AssetsDto implements IAssetsDto {
@@ -4660,7 +5065,6 @@ export class Bo_AssetDataDto implements IBo_AssetDataDto {
     networkName: string | undefined;
     walletsId: string;
     balance: number;
-    onholdBalance: number;
 
     constructor(data?: IBo_AssetDataDto) {
         if (data) {
@@ -4680,7 +5084,6 @@ export class Bo_AssetDataDto implements IBo_AssetDataDto {
             this.networkName = _data["networkName"];
             this.walletsId = _data["walletsId"];
             this.balance = _data["balance"];
-            this.onholdBalance = _data["onholdBalance"];
         }
     }
 
@@ -4700,7 +5103,6 @@ export class Bo_AssetDataDto implements IBo_AssetDataDto {
         data["networkName"] = this.networkName;
         data["walletsId"] = this.walletsId;
         data["balance"] = this.balance;
-        data["onholdBalance"] = this.onholdBalance;
         return data;
     }
 
@@ -4720,7 +5122,6 @@ export interface IBo_AssetDataDto {
     networkName: string | undefined;
     walletsId: string;
     balance: number;
-    onholdBalance: number;
 }
 
 export class Bo_SymbolDataDto implements IBo_SymbolDataDto {
@@ -4832,6 +5233,101 @@ export interface IBo_SymbolDataDto {
     externalMaxTransferAmt: number;
     isActive: boolean;
     isDefault: boolean;
+}
+
+export class Bo_TransactionDataDto implements IBo_TransactionDataDto {
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
+    amount: number;
+    fromWalletId: string;
+    fromWalletAddress: string;
+    toWalletId: string;
+    toWalletAddress: string;
+    status: TransferStatus;
+    transferType: TransferType;
+
+    constructor(data?: IBo_TransactionDataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.symbolsId = _data["symbolsId"];
+            this.symbol = _data["symbol"];
+            this.symbolName = _data["symbolName"];
+            this.network = _data["network"];
+            this.networkName = _data["networkName"];
+            this.executorUserId = _data["executorUserId"];
+            this.ownerUserId = _data["ownerUserId"];
+            this.amount = _data["amount"];
+            this.fromWalletId = _data["fromWalletId"];
+            this.fromWalletAddress = _data["fromWalletAddress"];
+            this.toWalletId = _data["toWalletId"];
+            this.toWalletAddress = _data["toWalletAddress"];
+            this.status = _data["status"];
+            this.transferType = _data["transferType"];
+        }
+    }
+
+    static fromJS(data: any): Bo_TransactionDataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new Bo_TransactionDataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["symbolsId"] = this.symbolsId;
+        data["symbol"] = this.symbol;
+        data["symbolName"] = this.symbolName;
+        data["network"] = this.network;
+        data["networkName"] = this.networkName;
+        data["executorUserId"] = this.executorUserId;
+        data["ownerUserId"] = this.ownerUserId;
+        data["amount"] = this.amount;
+        data["fromWalletId"] = this.fromWalletId;
+        data["fromWalletAddress"] = this.fromWalletAddress;
+        data["toWalletId"] = this.toWalletId;
+        data["toWalletAddress"] = this.toWalletAddress;
+        data["status"] = this.status;
+        data["transferType"] = this.transferType;
+        return data;
+    }
+
+    clone(): Bo_TransactionDataDto {
+        const json = this.toJSON();
+        let result = new Bo_TransactionDataDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBo_TransactionDataDto {
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
+    amount: number;
+    fromWalletId: string;
+    fromWalletAddress: string;
+    toWalletId: string;
+    toWalletAddress: string;
+    status: TransferStatus;
+    transferType: TransferType;
 }
 
 export class Bo_WalletDataDto implements IBo_WalletDataDto {
@@ -5008,8 +5504,9 @@ export class Bo_WalletPoliciesDataDto implements IBo_WalletPoliciesDataDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
+    status: WalletPoliciesStatus;
+    startDate: DateTime | undefined;
 
     constructor(data?: IBo_WalletPoliciesDataDto) {
         if (data) {
@@ -5025,8 +5522,9 @@ export class Bo_WalletPoliciesDataDto implements IBo_WalletPoliciesDataDto {
             this.delegateUserId = _data["delegateUserId"];
             this.walletsId = _data["walletsId"];
             this.transferRules = _data["transferRules"] ? TransferRulesDto.fromJS(_data["transferRules"]) : <any>undefined;
-            this.startDate = _data["startDate"] ? DateTime.fromISO(_data["startDate"].toString()) : <any>undefined;
             this.expiryDate = _data["expiryDate"] ? DateTime.fromISO(_data["expiryDate"].toString()) : <any>undefined;
+            this.status = _data["status"];
+            this.startDate = _data["startDate"] ? DateTime.fromISO(_data["startDate"].toString()) : <any>undefined;
         }
     }
 
@@ -5042,8 +5540,9 @@ export class Bo_WalletPoliciesDataDto implements IBo_WalletPoliciesDataDto {
         data["delegateUserId"] = this.delegateUserId;
         data["walletsId"] = this.walletsId;
         data["transferRules"] = this.transferRules ? this.transferRules.toJSON() : <any>undefined;
-        data["startDate"] = this.startDate ? this.startDate.toString() : <any>undefined;
         data["expiryDate"] = this.expiryDate ? this.expiryDate.toString() : <any>undefined;
+        data["status"] = this.status;
+        data["startDate"] = this.startDate ? this.startDate.toString() : <any>undefined;
         return data;
     }
 
@@ -5059,8 +5558,9 @@ export interface IBo_WalletPoliciesDataDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
+    status: WalletPoliciesStatus;
+    startDate: DateTime | undefined;
 }
 
 export class CoBoAccountInfoDto implements ICoBoAccountInfoDto {
@@ -5705,6 +6205,93 @@ export interface ICreateConfigSettingsDto {
     value: string;
 }
 
+export class CreateTransactionsDto implements ICreateTransactionsDto {
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
+    amount: number;
+    fromWalletId: string;
+    fromWalletAddress: string;
+    toWalletId: string;
+    toWalletAddress: string;
+
+    constructor(data?: ICreateTransactionsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.symbolsId = _data["symbolsId"];
+            this.symbol = _data["symbol"];
+            this.symbolName = _data["symbolName"];
+            this.network = _data["network"];
+            this.networkName = _data["networkName"];
+            this.executorUserId = _data["executorUserId"];
+            this.ownerUserId = _data["ownerUserId"];
+            this.amount = _data["amount"];
+            this.fromWalletId = _data["fromWalletId"];
+            this.fromWalletAddress = _data["fromWalletAddress"];
+            this.toWalletId = _data["toWalletId"];
+            this.toWalletAddress = _data["toWalletAddress"];
+        }
+    }
+
+    static fromJS(data: any): CreateTransactionsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTransactionsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["symbolsId"] = this.symbolsId;
+        data["symbol"] = this.symbol;
+        data["symbolName"] = this.symbolName;
+        data["network"] = this.network;
+        data["networkName"] = this.networkName;
+        data["executorUserId"] = this.executorUserId;
+        data["ownerUserId"] = this.ownerUserId;
+        data["amount"] = this.amount;
+        data["fromWalletId"] = this.fromWalletId;
+        data["fromWalletAddress"] = this.fromWalletAddress;
+        data["toWalletId"] = this.toWalletId;
+        data["toWalletAddress"] = this.toWalletAddress;
+        return data;
+    }
+
+    clone(): CreateTransactionsDto {
+        const json = this.toJSON();
+        let result = new CreateTransactionsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateTransactionsDto {
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
+    amount: number;
+    fromWalletId: string;
+    fromWalletAddress: string;
+    toWalletId: string;
+    toWalletAddress: string;
+}
+
 export class CreateWalletGroupsDto implements ICreateWalletGroupsDto {
     userId: string;
     tagName: string | undefined;
@@ -5756,7 +6343,6 @@ export class CreateWalletPoliciesDto implements ICreateWalletPoliciesDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
 
     constructor(data?: ICreateWalletPoliciesDto) {
@@ -5773,7 +6359,6 @@ export class CreateWalletPoliciesDto implements ICreateWalletPoliciesDto {
             this.delegateUserId = _data["delegateUserId"];
             this.walletsId = _data["walletsId"];
             this.transferRules = _data["transferRules"] ? TransferRulesDto.fromJS(_data["transferRules"]) : <any>undefined;
-            this.startDate = _data["startDate"] ? DateTime.fromISO(_data["startDate"].toString()) : <any>undefined;
             this.expiryDate = _data["expiryDate"] ? DateTime.fromISO(_data["expiryDate"].toString()) : <any>undefined;
         }
     }
@@ -5790,7 +6375,6 @@ export class CreateWalletPoliciesDto implements ICreateWalletPoliciesDto {
         data["delegateUserId"] = this.delegateUserId;
         data["walletsId"] = this.walletsId;
         data["transferRules"] = this.transferRules ? this.transferRules.toJSON() : <any>undefined;
-        data["startDate"] = this.startDate ? this.startDate.toString() : <any>undefined;
         data["expiryDate"] = this.expiryDate ? this.expiryDate.toString() : <any>undefined;
         return data;
     }
@@ -5807,13 +6391,15 @@ export interface ICreateWalletPoliciesDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
 }
 
 export class CreateWalletsDto implements ICreateWalletsDto {
     walletGroupsId: string;
-    tagName: string;
+    address: string | undefined;
+    tagName: string | undefined;
+    network: NetworksDto;
+    walletPolicies: WalletPoliciesDto[] | undefined;
     networkId: number | undefined;
 
     constructor(data?: ICreateWalletsDto) {
@@ -5828,7 +6414,14 @@ export class CreateWalletsDto implements ICreateWalletsDto {
     init(_data?: any) {
         if (_data) {
             this.walletGroupsId = _data["walletGroupsId"];
+            this.address = _data["address"];
             this.tagName = _data["tagName"];
+            this.network = _data["network"] ? NetworksDto.fromJS(_data["network"]) : <any>undefined;
+            if (Array.isArray(_data["walletPolicies"])) {
+                this.walletPolicies = [] as any;
+                for (let item of _data["walletPolicies"])
+                    this.walletPolicies.push(WalletPoliciesDto.fromJS(item));
+            }
             this.networkId = _data["networkId"];
         }
     }
@@ -5843,7 +6436,14 @@ export class CreateWalletsDto implements ICreateWalletsDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["walletGroupsId"] = this.walletGroupsId;
+        data["address"] = this.address;
         data["tagName"] = this.tagName;
+        data["network"] = this.network ? this.network.toJSON() : <any>undefined;
+        if (Array.isArray(this.walletPolicies)) {
+            data["walletPolicies"] = [];
+            for (let item of this.walletPolicies)
+                data["walletPolicies"].push(item.toJSON());
+        }
         data["networkId"] = this.networkId;
         return data;
     }
@@ -5858,7 +6458,10 @@ export class CreateWalletsDto implements ICreateWalletsDto {
 
 export interface ICreateWalletsDto {
     walletGroupsId: string;
-    tagName: string;
+    address: string | undefined;
+    tagName: string | undefined;
+    network: NetworksDto;
+    walletPolicies: WalletPoliciesDto[] | undefined;
     networkId: number | undefined;
 }
 
@@ -6135,6 +6738,77 @@ export class EntityTransactionsDto implements IEntityTransactionsDto {
 export interface IEntityTransactionsDto {
     id: string;
     transactionData: TransactionDataDto;
+}
+
+export class EntityTransactionsDtoIEnumerableResponseDto implements IEntityTransactionsDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: EntityTransactionsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: IEntityTransactionsDtoIEnumerableResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(EntityTransactionsDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): EntityTransactionsDtoIEnumerableResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityTransactionsDtoIEnumerableResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): EntityTransactionsDtoIEnumerableResponseDto {
+        const json = this.toJSON();
+        let result = new EntityTransactionsDtoIEnumerableResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IEntityTransactionsDtoIEnumerableResponseDto {
+    isSuccess: boolean;
+    result: EntityTransactionsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
 }
 
 export class EntityTransactionsDtoResponseDto implements IEntityTransactionsDtoResponseDto {
@@ -7285,12 +7959,18 @@ export interface ISymbolsDtoResponseDto {
 }
 
 export class TransactionDataDto implements ITransactionDataDto {
-    userId: string;
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
     amount: number;
-    symbol: string;
-    network: string;
     fromWalletId: string;
+    fromWalletAddress: string;
     toWalletId: string;
+    toWalletAddress: string;
     status: TransferStatus;
 
     constructor(data?: ITransactionDataDto) {
@@ -7304,12 +7984,18 @@ export class TransactionDataDto implements ITransactionDataDto {
 
     init(_data?: any) {
         if (_data) {
-            this.userId = _data["userId"];
-            this.amount = _data["amount"];
+            this.symbolsId = _data["symbolsId"];
             this.symbol = _data["symbol"];
+            this.symbolName = _data["symbolName"];
             this.network = _data["network"];
+            this.networkName = _data["networkName"];
+            this.executorUserId = _data["executorUserId"];
+            this.ownerUserId = _data["ownerUserId"];
+            this.amount = _data["amount"];
             this.fromWalletId = _data["fromWalletId"];
+            this.fromWalletAddress = _data["fromWalletAddress"];
             this.toWalletId = _data["toWalletId"];
+            this.toWalletAddress = _data["toWalletAddress"];
             this.status = _data["status"];
         }
     }
@@ -7323,12 +8009,18 @@ export class TransactionDataDto implements ITransactionDataDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["userId"] = this.userId;
-        data["amount"] = this.amount;
+        data["symbolsId"] = this.symbolsId;
         data["symbol"] = this.symbol;
+        data["symbolName"] = this.symbolName;
         data["network"] = this.network;
+        data["networkName"] = this.networkName;
+        data["executorUserId"] = this.executorUserId;
+        data["ownerUserId"] = this.ownerUserId;
+        data["amount"] = this.amount;
         data["fromWalletId"] = this.fromWalletId;
+        data["fromWalletAddress"] = this.fromWalletAddress;
         data["toWalletId"] = this.toWalletId;
+        data["toWalletAddress"] = this.toWalletAddress;
         data["status"] = this.status;
         return data;
     }
@@ -7342,13 +8034,231 @@ export class TransactionDataDto implements ITransactionDataDto {
 }
 
 export interface ITransactionDataDto {
-    userId: string;
+    symbolsId: string;
+    symbol: string | undefined;
+    symbolName: string | undefined;
+    network: string | undefined;
+    networkName: string | undefined;
+    executorUserId: string;
+    ownerUserId: string;
     amount: number;
-    symbol: string;
-    network: string;
     fromWalletId: string;
+    fromWalletAddress: string;
     toWalletId: string;
+    toWalletAddress: string;
     status: TransferStatus;
+}
+
+export class TransactionsDto implements ITransactionsDto {
+    id: string;
+    createdBy: string | undefined;
+    createdTime: DateTime;
+    lastModifiedBy: string | undefined;
+    lastModifiedTime: DateTime | undefined;
+    isDeleted: boolean;
+    deletedBy: string | undefined;
+    deletedTime: DateTime | undefined;
+    transactionData: Bo_TransactionDataDto;
+
+    constructor(data?: ITransactionsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.transactionData = new Bo_TransactionDataDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdBy = _data["createdBy"];
+            this.createdTime = _data["createdTime"] ? DateTime.fromISO(_data["createdTime"].toString()) : <any>undefined;
+            this.lastModifiedBy = _data["lastModifiedBy"];
+            this.lastModifiedTime = _data["lastModifiedTime"] ? DateTime.fromISO(_data["lastModifiedTime"].toString()) : <any>undefined;
+            this.isDeleted = _data["isDeleted"];
+            this.deletedBy = _data["deletedBy"];
+            this.deletedTime = _data["deletedTime"] ? DateTime.fromISO(_data["deletedTime"].toString()) : <any>undefined;
+            this.transactionData = _data["transactionData"] ? Bo_TransactionDataDto.fromJS(_data["transactionData"]) : new Bo_TransactionDataDto();
+        }
+    }
+
+    static fromJS(data: any): TransactionsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdBy"] = this.createdBy;
+        data["createdTime"] = this.createdTime ? this.createdTime.toString() : <any>undefined;
+        data["lastModifiedBy"] = this.lastModifiedBy;
+        data["lastModifiedTime"] = this.lastModifiedTime ? this.lastModifiedTime.toString() : <any>undefined;
+        data["isDeleted"] = this.isDeleted;
+        data["deletedBy"] = this.deletedBy;
+        data["deletedTime"] = this.deletedTime ? this.deletedTime.toString() : <any>undefined;
+        data["transactionData"] = this.transactionData ? this.transactionData.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): TransactionsDto {
+        const json = this.toJSON();
+        let result = new TransactionsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITransactionsDto {
+    id: string;
+    createdBy: string | undefined;
+    createdTime: DateTime;
+    lastModifiedBy: string | undefined;
+    lastModifiedTime: DateTime | undefined;
+    isDeleted: boolean;
+    deletedBy: string | undefined;
+    deletedTime: DateTime | undefined;
+    transactionData: Bo_TransactionDataDto;
+}
+
+export class TransactionsDtoPagedListResponseDto implements ITransactionsDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: TransactionsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: ITransactionsDtoPagedListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (Array.isArray(_data["result"])) {
+                this.result = [] as any;
+                for (let item of _data["result"])
+                    this.result.push(TransactionsDto.fromJS(item));
+            }
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): TransactionsDtoPagedListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionsDtoPagedListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (Array.isArray(this.result)) {
+            data["result"] = [];
+            for (let item of this.result)
+                data["result"].push(item.toJSON());
+        }
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): TransactionsDtoPagedListResponseDto {
+        const json = this.toJSON();
+        let result = new TransactionsDtoPagedListResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITransactionsDtoPagedListResponseDto {
+    isSuccess: boolean;
+    result: TransactionsDto[] | undefined;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+}
+
+export class TransactionsDtoResponseDto implements ITransactionsDtoResponseDto {
+    isSuccess: boolean;
+    result: TransactionsDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
+
+    constructor(data?: ITransactionsDtoResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.result = _data["result"] ? TransactionsDto.fromJS(_data["result"]) : <any>undefined;
+            this.displayMessage = _data["displayMessage"];
+            if (Array.isArray(_data["errorMessages"])) {
+                this.errorMessages = [] as any;
+                for (let item of _data["errorMessages"])
+                    this.errorMessages.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): TransactionsDtoResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TransactionsDtoResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
+        data["displayMessage"] = this.displayMessage;
+        if (Array.isArray(this.errorMessages)) {
+            data["errorMessages"] = [];
+            for (let item of this.errorMessages)
+                data["errorMessages"].push(item);
+        }
+        return data;
+    }
+
+    clone(): TransactionsDtoResponseDto {
+        const json = this.toJSON();
+        let result = new TransactionsDtoResponseDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITransactionsDtoResponseDto {
+    isSuccess: boolean;
+    result: TransactionsDto;
+    displayMessage: string | undefined;
+    errorMessages: string[] | undefined;
 }
 
 export class TransferDto implements ITransferDto {
@@ -7411,6 +8321,7 @@ export interface ITransferDto {
 }
 
 export class TransferLimitsDto implements ITransferLimitsDto {
+    id: string;
     symbolsId: string;
     dayLimit: number;
     dayBalance: number;
@@ -7436,6 +8347,7 @@ export class TransferLimitsDto implements ITransferLimitsDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.symbolsId = _data["symbolsId"];
             this.dayLimit = _data["dayLimit"];
             this.dayBalance = _data["dayBalance"];
@@ -7461,6 +8373,7 @@ export class TransferLimitsDto implements ITransferLimitsDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["symbolsId"] = this.symbolsId;
         data["dayLimit"] = this.dayLimit;
         data["dayBalance"] = this.dayBalance;
@@ -7486,6 +8399,7 @@ export class TransferLimitsDto implements ITransferLimitsDto {
 }
 
 export interface ITransferLimitsDto {
+    id: string;
     symbolsId: string;
     dayLimit: number;
     dayBalance: number;
@@ -7502,6 +8416,7 @@ export interface ITransferLimitsDto {
 }
 
 export class TransferRulesDto implements ITransferRulesDto {
+    id: string;
     transferLimits: TransferLimitsDto[] | undefined;
     whitelistAddresses: WhitelistAddressesDto[] | undefined;
     isTransferApprovalNeeded: boolean;
@@ -7517,6 +8432,7 @@ export class TransferRulesDto implements ITransferRulesDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             if (Array.isArray(_data["transferLimits"])) {
                 this.transferLimits = [] as any;
                 for (let item of _data["transferLimits"])
@@ -7540,6 +8456,7 @@ export class TransferRulesDto implements ITransferRulesDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         if (Array.isArray(this.transferLimits)) {
             data["transferLimits"] = [];
             for (let item of this.transferLimits)
@@ -7563,18 +8480,22 @@ export class TransferRulesDto implements ITransferRulesDto {
 }
 
 export interface ITransferRulesDto {
+    id: string;
     transferLimits: TransferLimitsDto[] | undefined;
     whitelistAddresses: WhitelistAddressesDto[] | undefined;
     isTransferApprovalNeeded: boolean;
 }
 
 export enum TransferStatus {
-    Pending = 1,
-    Completed = 2,
-    Failed = 3,
-    PendingApproval = 4,
-    Approved = 5,
-    Rejected = 6,
+    Completed = 1,
+    Failed = 2,
+    PendingApproval = 3,
+    Rejected = 4,
+}
+
+export enum TransferType {
+    Internal = 1,
+    External = 2,
 }
 
 export class UpdateWalletBalanceDto implements IUpdateWalletBalanceDto {
@@ -8046,8 +8967,9 @@ export class WalletPoliciesDataDto implements IWalletPoliciesDataDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
+    status: WalletPoliciesStatus;
+    startDate: DateTime | undefined;
 
     constructor(data?: IWalletPoliciesDataDto) {
         if (data) {
@@ -8063,8 +8985,9 @@ export class WalletPoliciesDataDto implements IWalletPoliciesDataDto {
             this.delegateUserId = _data["delegateUserId"];
             this.walletsId = _data["walletsId"];
             this.transferRules = _data["transferRules"] ? TransferRulesDto.fromJS(_data["transferRules"]) : <any>undefined;
-            this.startDate = _data["startDate"] ? DateTime.fromISO(_data["startDate"].toString()) : <any>undefined;
             this.expiryDate = _data["expiryDate"] ? DateTime.fromISO(_data["expiryDate"].toString()) : <any>undefined;
+            this.status = _data["status"];
+            this.startDate = _data["startDate"] ? DateTime.fromISO(_data["startDate"].toString()) : <any>undefined;
         }
     }
 
@@ -8080,8 +9003,9 @@ export class WalletPoliciesDataDto implements IWalletPoliciesDataDto {
         data["delegateUserId"] = this.delegateUserId;
         data["walletsId"] = this.walletsId;
         data["transferRules"] = this.transferRules ? this.transferRules.toJSON() : <any>undefined;
-        data["startDate"] = this.startDate ? this.startDate.toString() : <any>undefined;
         data["expiryDate"] = this.expiryDate ? this.expiryDate.toString() : <any>undefined;
+        data["status"] = this.status;
+        data["startDate"] = this.startDate ? this.startDate.toString() : <any>undefined;
         return data;
     }
 
@@ -8097,8 +9021,9 @@ export interface IWalletPoliciesDataDto {
     delegateUserId: string;
     walletsId: string;
     transferRules: TransferRulesDto;
-    startDate: DateTime | undefined;
     expiryDate: DateTime | undefined;
+    status: WalletPoliciesStatus;
+    startDate: DateTime | undefined;
 }
 
 export class WalletPoliciesDto implements IWalletPoliciesDto {
@@ -8308,6 +9233,14 @@ export interface IWalletPoliciesDtoResponseDto {
     result: WalletPoliciesDto;
     displayMessage: string | undefined;
     errorMessages: string[] | undefined;
+}
+
+export enum WalletPoliciesStatus {
+    Pending = 0,
+    Rejected = 1,
+    Active = 2,
+    Inactive = 3,
+    Expired = 4,
 }
 
 export class WalletsDto implements IWalletsDto {
@@ -8520,6 +9453,7 @@ export interface IWalletsDtoResponseDto {
 }
 
 export class WhitelistAddressesDto implements IWhitelistAddressesDto {
+    id: string;
     address: string;
     tagName: string | undefined;
 
@@ -8534,6 +9468,7 @@ export class WhitelistAddressesDto implements IWhitelistAddressesDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.address = _data["address"];
             this.tagName = _data["tagName"];
         }
@@ -8548,6 +9483,7 @@ export class WhitelistAddressesDto implements IWhitelistAddressesDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["address"] = this.address;
         data["tagName"] = this.tagName;
         return data;
@@ -8562,6 +9498,7 @@ export class WhitelistAddressesDto implements IWhitelistAddressesDto {
 }
 
 export interface IWhitelistAddressesDto {
+    id: string;
     address: string;
     tagName: string | undefined;
 }

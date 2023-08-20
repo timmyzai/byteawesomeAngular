@@ -45,7 +45,7 @@ export class TwoFactorAuthSetupComponent implements OnInit {
         this.responseHandler.handleResponse<EntityUserDto>(userResponseDto, null, 'getUserById Failed');
       }
     } catch (error: any) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'getUserById Failed');
+      this.responseHandler.handleUnhandledException(error, 'getUserById Failed');
     } finally {
       this.isPageLoading = false;
     }
@@ -88,7 +88,7 @@ export class TwoFactorAuthSetupComponent implements OnInit {
       const userResponseDto = await this.userService.enableOrDisableTwoFactorAuth(param).toPromise();
       this.user = userResponseDto.isSuccess ? userResponseDto.result : this.user;
     } catch (error: any) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'enableOrDisableTwoFactorAuth Failed');
+      this.responseHandler.handleUnhandledException(error, 'enableOrDisableTwoFactorAuth Failed');
     }
   }
 
@@ -108,7 +108,7 @@ export class TwoFactorAuthSetupComponent implements OnInit {
         this.responseHandler.handleResponse<GetTwoFactorAuthInfoResult>(twoFactorResponseDto, null, 'getTwoFactorAuthInfo Failed');
       }
     } catch (error: any) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'getTwoFactorAuthInfo Failed');
+      this.responseHandler.handleUnhandledException(error, 'getTwoFactorAuthInfo Failed');
     }
   }
 

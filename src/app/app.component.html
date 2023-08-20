@@ -2,12 +2,16 @@
   <div>
     <a routerLink="/home" *ngIf="isLoggedIn">Home</a>
   </div>
-  <div>
-    <a routerLink="/login" *ngIf="!isLoggedIn">Login</a>
-    <a routerLink="/register" *ngIf="!isLoggedIn">Register</a>
+  <div *ngIf="!isLoggedIn">
+    <a routerLink="/login">Login</a>
+    <a routerLink="/register">Register</a>
   </div>
-  <div>
-    <a routerLink="/wallet-group" *ngIf="isLoggedIn">Wallets Groups</a>
+  <div *ngIf="isLoggedIn">
+    <a routerLink="/wallet-group">Wallets Groups</a>
+    <a routerLink="/wp-assigned">WP-Assigned</a>
+    <a routerLink="/wp-received">WP-Received</a>
+    <a routerLink="/tx-pendings">TX-Pendings</a>
+    <a routerLink="/tx-records">TX-Records</a>
   </div>
 </nav>
 <div class="container m-3">

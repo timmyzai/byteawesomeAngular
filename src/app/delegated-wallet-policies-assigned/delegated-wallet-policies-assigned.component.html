@@ -1,0 +1,51 @@
+<div class="row wallet-container" *ngIf="!isPageLoading">
+    <div class="col-md-6 col-sm-12">
+        <div class="section" *ngIf="walletList && walletList.length > 0; else noWallet">
+            <ng-container *ngFor="let wallet of walletList ; let i=index;">
+                <ng-container *ngIf="wallet.walletData.walletPolicies.length > 0;">
+                    <h2>Wallet {{ i + 1}}</h2>
+                    <div class="wallet-info">
+                        <p><strong>Wallet ID:</strong> {{ wallet.id }}</p>
+                        <h5 class="card-text">Address: {{ wallet.walletData.address }}</h5>
+                        <h5 class="card-text">Network:
+                            {{ wallet.walletData.network.network }}
+                            ({{wallet.walletData.network.networkName}})
+                        </h5>
+                        <div class="wallet-policy-details">
+                            <div class="dropdown">
+                                <button class="btn btn-with-margin btn-secondary dropdown-toggle" type="button"
+                                    id="walletPolicyDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Wallet Policy ({{ wallet.walletData.walletPolicies.length }})
+                                </button>
+                                <a class="dropdown-item" [routerLink]="['/wallet', wallet.id]">
+                                    <button class="btn btn-dark btn-block">Go to wallet</button>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="walletPolicyDropdown">
+                                    <ng-container *ngFor="let walletPolicy of wallet.walletData.walletPolicies">
+                                        <a class="dropdown-item" [routerLink]="['/wallet-policy', walletPolicy.id]">
+                                            <div class=" d-flex flex-column">
+                                                <span class="fw-bold">
+                                                    Delegate User Id:{{ walletPolicy.walletPoliciesData.delegateUserId
+                                                    }}
+                                                </span>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold">
+                                                    Status: {{ getStatusName(walletPolicy.walletPoliciesData.status) }}
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+        <ng-template #noWallet>
+            No Wallet found.
+        </ng-template>
+    </div>
+</div>

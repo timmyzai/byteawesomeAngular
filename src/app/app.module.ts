@@ -27,6 +27,11 @@ import { RegistrationComponent } from './register/register.component';
 import { ForgotpasswordComponent } from './forgotpassword/forgotpassword.component';
 import { ConfirmationAuthPageComponent } from './confirmation-auth-page/confirmation-auth-page.component';
 import { PinInputBoxModalComponent } from './modals/pin-input-box-modal/pin-input-box-modal.component';
+import { DelegatedWalletPoliciesReceivedComponent } from './delegated-wallet-policies-received/delegated-wallet-policies-received.component';
+import { DelegatedWalletPoliciesAssignedComponent } from './delegated-wallet-policies-assigned/delegated-wallet-policies-assigned.component';
+import { WalletPolicyDetailComponent } from './wallet-policy-detail/wallet-policy-detail.component';
+import { TransactionApproveRejectComponent } from './transaction-approve-reject/transaction-approve-reject.component';
+import { TransactionRecordsComponent } from './transaction-records/transaction-records.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +47,11 @@ import { PinInputBoxModalComponent } from './modals/pin-input-box-modal/pin-inpu
     WalletComponent,
     ForgotpasswordComponent,
     ConfirmationAuthPageComponent,
+    DelegatedWalletPoliciesReceivedComponent,
+    DelegatedWalletPoliciesAssignedComponent,
+    WalletPolicyDetailComponent,
+    TransactionApproveRejectComponent,
+    TransactionRecordsComponent,
   ],
   imports: [
     BrowserModule,

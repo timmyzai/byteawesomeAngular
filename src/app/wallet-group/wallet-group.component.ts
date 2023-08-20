@@ -60,8 +60,9 @@ export class WalletGroupComponent implements OnInit {
         },
         'getNetworkList Failed'
       );
-    } catch (error) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'getNetworkList Failed');
+    }
+    catch (error) {
+      this.responseHandler.handleUnhandledException(error, 'getNetworkList Failed');
     }
   }
 
@@ -78,8 +79,9 @@ export class WalletGroupComponent implements OnInit {
         },
         'getWalletGroup Failed'
       );
-    } catch (error) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'getWalletGroup Failed');
+    }
+    catch (error) {
+      this.responseHandler.handleUnhandledException(error, 'getWalletGroup Failed');
     }
   }
 
@@ -96,8 +98,9 @@ export class WalletGroupComponent implements OnInit {
         },
         'addWalletGroup Failed'
       );
-    } catch (error) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'addWalletGroup Failed');
+    }
+    catch (error) {
+      this.responseHandler.handleUnhandledException(error, 'addWalletGroup Failed');
     }
   }
 
@@ -116,8 +119,9 @@ export class WalletGroupComponent implements OnInit {
         },
         'addWallet Failed'
       );
-    } catch (error) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'addWallet Failed');
+    }
+    catch (error) {
+      this.responseHandler.handleUnhandledException(error, 'addWallet Failed');
     }
   }
 
@@ -142,12 +146,9 @@ export class WalletGroupComponent implements OnInit {
         },
         'updateWalletGroup Failed'
       );
-    } catch (error) {
-      this.responseHandler.handleCommonApiErrorResponse(error, 'updateWalletGroup Failed');
     }
-  }
-
-  navigateToWallet(walletId: string) {
-    this.router.navigate([`wallet/${walletId}`]);
+    catch (error) {
+      this.responseHandler.handleUnhandledException(error, 'updateWalletGroup Failed');
+    }
   }
 }

@@ -1,0 +1,12 @@
+.transfer-limit-form,
+.whitelist-address-form {
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+
+.delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+}

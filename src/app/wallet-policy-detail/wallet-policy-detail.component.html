@@ -1,0 +1,94 @@
+<div class="row walletPolicy-container" *ngIf="!isPageLoading && walletPolicy && walletPolicy.walletPoliciesData">
+    <div class="col-md-6 col-sm-12">
+        <div class="section">
+            <h2>Wallet Policy Detail</h2>
+            <form (ngSubmit)="SubmitEditWalletPolicy()">
+                <div class="form-group">
+                    <label class="form-label" for="walletPolicyId">Wallet Policy ID:</label>
+                    <input type="text" class="form-control" id="walletPolicyId"
+                        value="{{ walletPolicy.id }}" name="walletPolicyId" disabled>
+                    <label class="form-label" for="delegateUserId">Delegate User ID:</label>
+                    <input type="text" class="form-control" id="delegateUserId"
+                        value="{{ walletPolicy.walletPoliciesData.delegateUserId }}" name="delegateUserId" disabled>
+                    <label class="form-label" for="walletsId">Wallet ID:</label>
+                    <input type="text" class="form-control" id="walletsId"
+                        value="{{ walletPolicy.walletPoliciesData.walletsId }}" name="walletsId" disabled>
+                </div>
+
+                <div class="form-group">
+                    <h4>Transfer Limits</h4>
+                    <div class="transfer-limit"
+                        *ngFor="let limit of walletPolicy.walletPoliciesData.transferRules?.transferLimits; let i = index;">
+                        <div class="transfer-limit-form">
+                            <h3 class="text-center">
+                                Limit {{ i + 1}}
+                            </h3>
+                            <button type="button" class="btn btn-danger delete-button" (click)="deleteTransferLimit(i)">
+                                X
+                            </button>
+                            <label class="form-label" for="investmentSymbol">Symbol:</label>
+                            <select [(ngModel)]="limit.symbolsId" name="symbolsId {{ i }}" id="symbolsId{{ i }}" name="
+                                symbolsId{{ i }}" required class="form-select">
+                                <option *ngFor="let symbol of symbolList" [value]="symbol.id">
+                                    {{ symbol.symbolData.symbol }} ({{symbol.symbolData.network}})
+                                </option>
+                            </select>
+                            <label class="form-label" for="dayLimit{{ i }}">Day Limit:</label>
+                            <input type="number" class="form-control" id="dayLimit{{ i }}" [(ngModel)]="limit.dayLimit"
+                                name="dayLimit{{ i }}">
+                            <label class="form-label" for="weekLimit{{ i }}">Week Limit:</label>
+                            <input type="number" class="form-control" id="weekLimit{{ i }}"
+                                [(ngModel)]="limit.weekLimit" name="weekLimit{{ i }}">
+                            <label class="form-label" for="monthLimit{{ i }}">Month Limit:</label>
+                            <input type="number" class="form-control" id="monthLimit{{ i }}"
+                                [(ngModel)]="limit.monthLimit" name="monthLimit{{ i }}">
+                            <label class="form-label" for="yearLimit{{ i }}">Year Limit:</label>
+                            <input type="number" class="form-control" id="yearLimit{{ i }}"
+                                [(ngModel)]="limit.yearLimit" name="yearLimit{{ i }}">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-with-margin btn-secondary" (click)="addTransferLimit()">
+                        Add Transfer Limit
+                    </button>
+                </div>
+                <div class="form-group">
+                    <h4>Whitelist Addresses</h4>
+                    <div class="whitelist-address-form"
+                        *ngFor="let address of walletPolicy.walletPoliciesData.transferRules?.whitelistAddresses; let i = index;">
+                        <h3 class="text-center">
+                            Address {{ i + 1}}
+                        </h3>
+                        <button type="button" class="btn btn-danger delete-button" (click)="deleteWhitelistAddress(i)">
+                            X
+                        </button>
+                        <label class="form-label" for="address">Address</label>
+                        <input type="text" class="form-control" id="address" [(ngModel)]="address.address"
+                            name="address{{ i }}">
+                        <label class="form-label" for="tagName">Tag Name:</label>
+                        <input type="text" class="form-control" id="tagName" [(ngModel)]="address.tagName"
+                            name="tagName{{ i }}">
+                    </div>
+                    <button type="button" class="btn btn-with-margin btn-secondary" (click)="addWhitelistAddress()">
+                        Add Whitelist Address
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="isTransferApprovalNeeded">Transfer Approval Needed:</label>
+                    <input type="checkbox" class="form-check-input" id="isTransferApprovalNeeded"
+                        [checked]="walletPolicy.walletPoliciesData?.transferRules?.isTransferApprovalNeeded"
+                        (change)="updateTransferApproval($event)" name="isTransferApprovalNeeded">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="expiryDate">Expiry Date:</label>
+                    <div class="input-group">
+                        <input type="datetime-local" class="form-control" id="expiryDate" name="expiryDate"
+                            [ngModel]="formatDateForInput(walletPolicy.walletPoliciesData.expiryDate)"
+                            (ngModelChange)="walletPolicy.walletPoliciesData.expiryDate = $event" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-with-margin btn-primary">Update Wallet Policy</button>
+            </form>
+        </div>
+    </div>
+</div>

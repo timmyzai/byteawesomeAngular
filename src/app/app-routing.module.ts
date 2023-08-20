@@ -9,6 +9,12 @@ import { WalletComponent } from './wallet/wallet.component';
 import { RegistrationComponent } from './register/register.component';
 import { ConfirmationAuthPageComponent } from './confirmation-auth-page/confirmation-auth-page.component';
 import { ForgotpasswordComponent } from './forgotpassword/forgotpassword.component';
+import { DelegatedWalletPoliciesReceivedComponent } from './delegated-wallet-policies-received/delegated-wallet-policies-received.component';
+import { DelegatedWalletPoliciesAssignedComponent } from './delegated-wallet-policies-assigned/delegated-wallet-policies-assigned.component';
+import { WalletPolicyDetailComponent } from './wallet-policy-detail/wallet-policy-detail.component';
+import { TransactionRecordsComponent } from './transaction-records/transaction-records.component';
+import { TransactionApproveRejectComponent } from './transaction-approve-reject/transaction-approve-reject.component';
+
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
@@ -19,6 +25,11 @@ const routes: Routes = [
   { path: 'forgotpassword-page', component: ForgotpasswordComponent },
   { path: 'wallet-group', component: WalletGroupComponent },
   { path: 'wallet/:id', component: WalletComponent },
+  { path: 'wp-received', component: DelegatedWalletPoliciesReceivedComponent },
+  { path: 'wp-assigned', component: DelegatedWalletPoliciesAssignedComponent },
+  { path: 'wallet-policy/:id', component: WalletPolicyDetailComponent },
+  { path: 'tx-records', component: TransactionRecordsComponent },
+  { path: 'tx-pendings', component: TransactionApproveRejectComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ];
